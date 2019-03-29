@@ -8,12 +8,16 @@ pub struct Vec3 {
 }
 
 impl Vec3 {
-    pub fn length(self) -> f64 {
+    pub fn new(x: f64, y: f64, z: f64) -> Vec3 {
+        Vec3 { x, y, z }
+    }
+
+    pub fn length(&self) -> f64 {
         self.squared_length().sqrt()
     }
 
-    pub fn squared_length(self) -> f64 {
-        self.x * self.x + self.y * self.y * self.z * self.z
+    pub fn squared_length(&self) -> f64 {
+        self.x * self.x + self.y * self.y + self.z * self.z
     }
 
     pub fn make_unit_vector(&mut self) {
