@@ -3,21 +3,24 @@ mod ray;
 mod hitable;
 mod sphere;
 mod camera;
+mod material;
 
 use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable, HitableList };
 use ray::Ray;
 use std::f64::MAX;
-use sphere::{ Sphere, random_in_unit_sphere };
+use sphere::{ Sphere };
 use camera::Camera;
 use rand::Rng;
+use material::{ Lambertion, Metal };
 
-fn color<T: Hitable>(r: &Ray, world: &T) -> Vec3 {
+fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
-        let target = rec.p + rec.normal + random_in_unit_sphere();
-        return 0.5 * color(&(Ray {
-            origin: rec.p, direction: target - rec.p
-        }), world)
+        if depth >= 50 { return Vec3::new(0.0, 0.0, 0.0); }
+        if let Some((attenuation, scattered)) = rec.material.scatter(r, &rec) {
+            return attenuation * color(&scattered, world, depth + 1);
+        }
+        return Vec3::new(0.0, 0.0, 0.0);
     }
 
     let unit_direction = unit_vector(r.direction);
@@ -33,8 +36,26 @@ fn main() {
     println!("P3\n{} {}\n255\n", nx, ny);
 
     let world = HitableList { list: vec![
-        Sphere { center: Vec3::new(0.0, 0.0, -1.0), radius: 0.5 },
-        Sphere { center: Vec3::new(0.0, -100.5, -1.0), radius: 100.0 }
+        Sphere {
+            center: Vec3::new(0.0, 0.0, -1.0),
+            radius: 0.5,
+            material: Box::new(Lambertion { albedo: Vec3::new(0.8, 0.3, 0.3) })
+        },
+        Sphere {
+            center: Vec3::new(0.0, -100.5, -1.0),
+            radius: 100.0,
+            material: Box::new(Lambertion { albedo: Vec3::new(0.8, 0.8, 0.0) })
+        },
+        Sphere {
+            center: Vec3::new(1.0, 0.0, -1.0),
+            radius: 0.5,
+            material: Box::new(Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 0.3 })
+        },
+        Sphere {
+            center: Vec3::new(-1.0, 0.0, -1.0),
+            radius: 0.5,
+            material: Box::new(Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 })
+        },
     ] };
 
     let cam = Camera::default();
@@ -46,7 +67,7 @@ fn main() {
                 let u = (f64::from(i) + rng.gen::<f64>()) / f64::from(nx);
                 let v = (f64::from(j) + rng.gen::<f64>()) / f64::from(ny);
                 let r = cam.get_ray(u, v);
-                col += color(&r, &world);
+                col += color(&r, &world, 0);
             };
 
             col /= f64::from(ns);
