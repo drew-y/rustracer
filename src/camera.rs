@@ -11,7 +11,7 @@ pub struct Camera {
 }
 
 impl Camera {
-    fn get_ray(&self, u: f64, v: f64) -> Ray {
+    pub fn get_ray(&self, u: f64, v: f64) -> Ray {
         Ray {
             origin: self.origin,
             direction: self.lower_left_corner + u * self.horizontal +
