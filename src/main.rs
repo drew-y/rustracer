@@ -43,13 +43,14 @@ fn main() {
     for j in (0..ny).rev() {
         for i in 0..nx {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
-            for s in 0..ns {
+            for _s in 0..ns {
                 let u = (f64::from(i) + rng.gen::<f64>()) / f64::from(nx);
                 let v = (f64::from(j) + rng.gen::<f64>()) / f64::from(ny);
                 let r = cam.get_ray(u, v);
                 col += color(&r, &world);
             };
 
+            col /= f64::from(ns);
             let ir = (255.99 * col.x) as i64;
             let ig = (255.99 * col.y) as i64;
             let ib = (255.99 * col.z) as i64;

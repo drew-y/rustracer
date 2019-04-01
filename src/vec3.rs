@@ -183,8 +183,8 @@ impl ops::MulAssign<f64> for Vec3 {
 impl ops::DivAssign<f64> for Vec3 {
     fn div_assign(&mut self, _rhs: f64) {
         let k = 1.0 / _rhs;
-        self.x /= k;
-        self.y /= k;
-        self.z /= k;
+        self.x *= k;
+        self.y *= k;
+        self.z *= k;
     }
 }
