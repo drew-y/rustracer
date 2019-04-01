@@ -8,17 +8,16 @@ use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable, HitableList };
 use ray::Ray;
 use std::f64::MAX;
-use sphere::Sphere;
+use sphere::{ Sphere, random_in_unit_sphere };
 use camera::Camera;
 use rand::Rng;
 
 fn color<T: Hitable>(r: &Ray, world: &T) -> Vec3 {
-    if let Some(rec) = world.hit(r, 0.0, MAX) {
-        return 0.5 * Vec3::new(
-            rec.normal.x + 1.0,
-            rec.normal.y + 1.0,
-            rec.normal.z + 1.0
-        );
+    if let Some(rec) = world.hit(r, 0.001, MAX) {
+        let target = rec.p + rec.normal + random_in_unit_sphere();
+        return 0.5 * color(&(Ray {
+            origin: rec.p, direction: target - rec.p
+        }), world)
     }
 
     let unit_direction = unit_vector(r.direction);
