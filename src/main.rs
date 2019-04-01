@@ -2,11 +2,14 @@ mod vec3;
 mod ray;
 mod hitable;
 mod sphere;
+mod camera;
+
 use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable, HitableList };
 use ray::Ray;
 use std::f64::MAX;
 use sphere::Sphere;
+use camera::Camera;
 
 fn color<T: Hitable>(r: &Ray, world: &T) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.0, MAX) {
