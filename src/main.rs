@@ -11,7 +11,7 @@ use ray::Ray;
 use std::f64::MAX;
 use sphere::{ Sphere };
 use camera::Camera;
-use rand::Rng;
+use rand::prelude::*;
 use material::{ Material };
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
@@ -32,7 +32,7 @@ fn main() {
     let nx = 1600;
     let ny = 800;
     let ns = 100;
-    let mut rng = rand::thread_rng();
+    let mut rng = thread_rng();
     println!("P3\n{} {}\n255\n", nx, ny);
 
     let world = HitableList { list: vec![

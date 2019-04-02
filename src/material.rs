@@ -63,7 +63,7 @@ impl Material {
                 -dot(&r.direction, &rec.normal) / r.direction.length())
         };
 
-        let mut rng = rand::thread_rng();
+        let mut rng = thread_rng();
         if let Some(refracted) = Material::refract(&r.direction, &outward_normal, ni_over_nt) {
             let reflect_prob = Material::schlick(cosine, ref_idx);
             if rng.gen::<f64>() >= reflect_prob {

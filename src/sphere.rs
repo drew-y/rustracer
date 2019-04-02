@@ -1,7 +1,7 @@
 use super::hitable::{ Hitable, HitRecord };
 use super::vec3::{ Vec3, dot, };
 use super::ray::Ray;
-use rand::Rng;
+use rand::prelude::*;
 use super::material::Material;
 
 pub struct Sphere {
@@ -37,7 +37,7 @@ impl Hitable for Sphere {
 }
 
 pub fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = rand::thread_rng();
+    let mut rng = thread_rng();
     let mut rnd = || rng.gen::<f64>();
     let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), rnd()) - Vec3::new(1.0, 1.0, 1.0);
     let mut p = sample();
