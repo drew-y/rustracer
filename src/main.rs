@@ -29,8 +29,8 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
 }
 
 fn main() {
-    let nx = 1600;
-    let ny = 800;
+    let nx = 200;
+    let ny = 100;
     let ns = 100;
     let mut rng = thread_rng();
     println!("P3\n{} {}\n255\n", nx, ny);
@@ -39,7 +39,7 @@ fn main() {
         Sphere {
             center: Vec3::new(0.0, 0.0, -1.0),
             radius: 0.5,
-            material: Material::Lambertion { albedo: Vec3::new(0.8, 0.3, 0.3) }
+            material: Material::Lambertion { albedo: Vec3::new(0.1, 0.2, 0.5) }
         },
         Sphere {
             center: Vec3::new(0.0, -100.5, -1.0),
@@ -63,7 +63,13 @@ fn main() {
         },
     ] };
 
-    let cam = Camera::default();
+    let cam = Camera::new(
+        Vec3::new(-2.0, 2.0, 1.0),
+        Vec3::new(0.0, 0.0, -1.0),
+        Vec3::new(0.0, 1.0, 0.0),
+        45.0,
+        f64::from(nx) / f64::from(ny)
+    );
 
     for j in (0..ny).rev() {
         for i in 0..nx {
@@ -76,6 +82,9 @@ fn main() {
             };
 
             col /= f64::from(ns);
+            col.x = col.x.sqrt();
+            col.y = col.y.sqrt();
+            col.z = col.z.sqrt();
             let ir = (255.99 * col.x) as i64;
             let ig = (255.99 * col.y) as i64;
             let ib = (255.99 * col.z) as i64;
