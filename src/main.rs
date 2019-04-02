@@ -23,7 +23,7 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
         return Vec3::new(0.0, 0.0, 0.0);
     }
 
-    let unit_direction = unit_vector(r.direction);
+    let unit_direction = unit_vector(&r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
@@ -54,7 +54,12 @@ fn main() {
         Sphere {
             center: Vec3::new(-1.0, 0.0, -1.0),
             radius: 0.5,
-            material: Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 }
+            material: Material::Dielectric { ref_idx: 1.5 }
+        },
+        Sphere {
+            center: Vec3::new(-1.0, 0.0, -1.0),
+            radius: -0.45,
+            material: Material::Dielectric { ref_idx: 1.5 }
         },
     ] };
 

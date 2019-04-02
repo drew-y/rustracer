@@ -40,7 +40,7 @@ pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
     }
 }
 
-pub fn unit_vector(v: Vec3) -> Vec3 {
+pub fn unit_vector(v: &Vec3) -> Vec3 {
     v / v.length()
 }
 
@@ -87,6 +87,18 @@ impl ops::Sub<Vec3> for &Vec3 {
             x: self.x - _rhs.x,
             y: self.y - _rhs.y,
             z: self.z - _rhs.z
+        }
+    }
+}
+
+impl ops::Neg for Vec3 {
+    type Output = Vec3;
+
+    fn neg(self) -> Vec3 {
+        Vec3 {
+            x: self.x * -1.0,
+            y: self.y * -1.0,
+            z: self.z * -1.0
         }
     }
 }
@@ -164,6 +176,18 @@ impl ops::Div<Vec3> for Vec3 {
 }
 
 impl ops::Div<f64> for Vec3 {
+    type Output = Vec3;
+
+    fn div(self, _rhs: f64) -> Vec3 {
+        Vec3 {
+            x: self.x / _rhs,
+            y: self.y / _rhs,
+            z: self.z / _rhs
+        }
+    }
+}
+
+impl ops::Div<f64> for &Vec3 {
     type Output = Vec3;
 
     fn div(self, _rhs: f64) -> Vec3 {
