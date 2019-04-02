@@ -12,7 +12,7 @@ use std::f64::MAX;
 use sphere::{ Sphere };
 use camera::Camera;
 use rand::prelude::*;
-use material::{ Material };
+use material::Material::{ Lambertion, Metal, Dielectric };
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
@@ -37,7 +37,7 @@ fn random_scene() -> HitableList<Sphere> {
             Sphere {
                 center: Vec3::new(0.0, -1000.0, 0.0),
                 radius: 1000.0,
-                material: Material::Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
+                material: Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
             },
         ]
     };
@@ -52,7 +52,7 @@ fn random_scene() -> HitableList<Sphere> {
                     list.list.push(Sphere {
                         center,
                         radius: 0.2,
-                        material: Material::Lambertion { albedo: Vec3::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()) }
+                        material: Lambertion { albedo: Vec3::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()) }
                     });
                     continue;
                 };
@@ -61,7 +61,7 @@ fn random_scene() -> HitableList<Sphere> {
                     list.list.push(Sphere {
                         center,
                         radius: 0.2,
-                        material: Material::Metal {
+                        material: Metal {
                             albedo: Vec3::new(0.5 * (1.0 + rnd()), 0.5 * (1.0 + rnd()), 0.5 * (1.0 + rnd())),
                             fuzz: 0.5 * rnd()
                         }
@@ -72,7 +72,7 @@ fn random_scene() -> HitableList<Sphere> {
                 // Glass
                 list.list.push(Sphere {
                     center, radius: 0.2,
-                    material: Material::Dielectric { ref_idx: 1.5 }
+                    material: Dielectric { ref_idx: 1.5 }
                 })
             };
         };
@@ -80,17 +80,17 @@ fn random_scene() -> HitableList<Sphere> {
 
     list.list.push(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0,
-        material: Material::Dielectric { ref_idx: 1.5 }
+        material: Dielectric { ref_idx: 1.5 }
     });
 
     list.list.push(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0,
-        material: Material::Lambertion { albedo: Vec3::new(0.4, 0.2, 0.1) }
+        material: Lambertion { albedo: Vec3::new(0.4, 0.2, 0.1) }
     });
 
     list.list.push(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0,
-        material: Material::Metal {
+        material: Metal {
             albedo: Vec3::new(0.7, 0.6, 0.5),
             fuzz: 0.0
         }
