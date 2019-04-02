@@ -12,7 +12,7 @@ use std::f64::MAX;
 use sphere::{ Sphere };
 use camera::Camera;
 use rand::Rng;
-use material::{ Lambertion, Metal };
+use material::{ Material };
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
@@ -29,8 +29,8 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
 }
 
 fn main() {
-    let nx = 200;
-    let ny = 100;
+    let nx = 1600;
+    let ny = 800;
     let ns = 100;
     let mut rng = rand::thread_rng();
     println!("P3\n{} {}\n255\n", nx, ny);
@@ -39,22 +39,22 @@ fn main() {
         Sphere {
             center: Vec3::new(0.0, 0.0, -1.0),
             radius: 0.5,
-            material: Box::new(Lambertion { albedo: Vec3::new(0.8, 0.3, 0.3) })
+            material: Material::Lambertion { albedo: Vec3::new(0.8, 0.3, 0.3) }
         },
         Sphere {
             center: Vec3::new(0.0, -100.5, -1.0),
             radius: 100.0,
-            material: Box::new(Lambertion { albedo: Vec3::new(0.8, 0.8, 0.0) })
+            material: Material::Lambertion { albedo: Vec3::new(0.8, 0.8, 0.0) }
         },
         Sphere {
             center: Vec3::new(1.0, 0.0, -1.0),
             radius: 0.5,
-            material: Box::new(Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 0.3 })
+            material: Material::Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 0.3 }
         },
         Sphere {
             center: Vec3::new(-1.0, 0.0, -1.0),
             radius: 0.5,
-            material: Box::new(Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 })
+            material: Material::Metal { albedo: Vec3::new(0.8, 0.8, 0.8), fuzz: 0.3 }
         },
     ] };
 

@@ -7,10 +7,10 @@ use super::material::Material;
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f64,
-    pub material: Box<Material>
+    pub material: Material
 }
 
-impl <'a> Hitable for Sphere {
+impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         let oc = r.origin - self.center;
         let a = dot(&r.direction, &r.direction);
@@ -22,7 +22,7 @@ impl <'a> Hitable for Sphere {
             let gen_hit_record = |t: f64| {
                 let p = r.point_at_parameter(t);
                 Some(HitRecord {
-                    t, p, material: &*self.material,
+                    t, p, material: &self.material,
                     normal: (p - self.center) / self.radius
                 })
             };
