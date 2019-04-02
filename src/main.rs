@@ -28,47 +28,97 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
+fn random_scene() -> HitableList<Sphere> {
+    let mut rng = thread_rng();
+    let mut rnd = || rng.gen::<f64>();
+    let fl = |i: i32| f64::from(i);
+    let mut list = HitableList {
+        list: vec![
+            Sphere {
+                center: Vec3::new(0.0, -1000.0, 0.0),
+                radius: 1000.0,
+                material: Material::Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
+            },
+        ]
+    };
+
+    for a in -11..11 {
+        for b in -11..11 {
+            let choose_mat = rnd();
+            let center = Vec3::new(fl(a) + 0.9 * rnd(), 0.2, fl(b) + 0.9 * rnd());
+            if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                // Diffuse
+                if choose_mat < 0.8 {
+                    list.list.push(Sphere {
+                        center,
+                        radius: 0.2,
+                        material: Material::Lambertion { albedo: Vec3::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()) }
+                    });
+                    continue;
+                };
+
+                if choose_mat < 0.95 { // Metal
+                    list.list.push(Sphere {
+                        center,
+                        radius: 0.2,
+                        material: Material::Metal {
+                            albedo: Vec3::new(0.5 * (1.0 + rnd()), 0.5 * (1.0 + rnd()), 0.5 * (1.0 + rnd())),
+                            fuzz: 0.5 * rnd()
+                        }
+                    });
+                    continue;
+                };
+
+                // Glass
+                list.list.push(Sphere {
+                    center, radius: 0.2,
+                    material: Material::Dielectric { ref_idx: 1.5 }
+                })
+            };
+        };
+    };
+
+    list.list.push(Sphere {
+        center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0,
+        material: Material::Dielectric { ref_idx: 1.5 }
+    });
+
+    list.list.push(Sphere {
+        center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0,
+        material: Material::Lambertion { albedo: Vec3::new(0.4, 0.2, 0.1) }
+    });
+
+    list.list.push(Sphere {
+        center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0,
+        material: Material::Metal {
+            albedo: Vec3::new(0.7, 0.6, 0.5),
+            fuzz: 0.0
+        }
+    });
+
+    list
+}
+
 fn main() {
-    let nx = 200;
-    let ny = 100;
-    let ns = 100;
+    let nx = 1600;
+    let ny = 800;
+    let ns = 50;
     let mut rng = thread_rng();
     println!("P3\n{} {}\n255\n", nx, ny);
 
-    let world = HitableList { list: vec![
-        Sphere {
-            center: Vec3::new(0.0, 0.0, -1.0),
-            radius: 0.5,
-            material: Material::Lambertion { albedo: Vec3::new(0.1, 0.2, 0.5) }
-        },
-        Sphere {
-            center: Vec3::new(0.0, -100.5, -1.0),
-            radius: 100.0,
-            material: Material::Lambertion { albedo: Vec3::new(0.8, 0.8, 0.0) }
-        },
-        Sphere {
-            center: Vec3::new(1.0, 0.0, -1.0),
-            radius: 0.5,
-            material: Material::Metal { albedo: Vec3::new(0.8, 0.6, 0.2), fuzz: 0.3 }
-        },
-        Sphere {
-            center: Vec3::new(-1.0, 0.0, -1.0),
-            radius: 0.5,
-            material: Material::Dielectric { ref_idx: 1.5 }
-        },
-        Sphere {
-            center: Vec3::new(-1.0, 0.0, -1.0),
-            radius: -0.45,
-            material: Material::Dielectric { ref_idx: 1.5 }
-        },
-    ] };
+    let world = random_scene();
+
+    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
+    let lookat = Vec3::new(0.0, 0.0, 0.0);
+    let dist_to_focus = 10.0;
+    let aperture = 0.1;
 
     let cam = Camera::new(
-        Vec3::new(-2.0, 2.0, 1.0),
-        Vec3::new(0.0, 0.0, -1.0),
+        lookfrom, lookat,
         Vec3::new(0.0, 1.0, 0.0),
-        45.0,
-        f64::from(nx) / f64::from(ny)
+        20.0,
+        f64::from(nx) / f64::from(ny),
+        aperture, dist_to_focus
     );
 
     for j in (0..ny).rev() {
