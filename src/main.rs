@@ -100,9 +100,9 @@ fn random_scene() -> HitableList<Sphere> {
 }
 
 fn main() {
-    let nx = 1600;
+    let nx = 1200;
     let ny = 800;
-    let ns = 50;
+    let ns = 10;
     let mut rng = thread_rng();
     println!("P3\n{} {}\n255\n", nx, ny);
 
