@@ -140,9 +140,9 @@ fn render<T: Hitable>(scene: Scene<T>) -> Vec<String> {
 }
 
 fn main() {
-    let nx = 1200;
+    let nx = 1600;
     let ny = 800;
-    let ns = 10;
+    let ns = 50;
     let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
 
     let world = Arc::new(random_scene());
@@ -161,7 +161,7 @@ fn main() {
     );
 
     let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];
-    let thread_count = 4;
+    let thread_count = 8;
     let y_section_size = ny / thread_count;
     let mut starty = ny - y_section_size;
     let mut endy = ny;
