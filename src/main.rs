@@ -9,6 +9,8 @@ use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable, HitableList };
 use ray::Ray;
 use std::f64::MAX;
+use std::thread;
+use std::sync::Arc;
 use sphere::{ Sphere };
 use camera::Camera;
 use rand::prelude::*;
@@ -99,14 +101,51 @@ fn random_scene() -> HitableList<Sphere> {
     list
 }
 
+struct Scene<'a, T: Hitable> {
+    starty: i32,
+    endy: i32,
+    nx: i32,
+    ny: i32,
+    ns: i32,
+    cam: &'a Camera,
+    hitables: &'a HitableList<T>
+}
+
+fn render<T: Hitable>(scene: Scene<T>) -> Vec<String> {
+    let mut file: Vec<String> = vec![];
+    let Scene { ns, nx, ny, cam, hitables, starty, endy } = scene;
+    let mut rng = thread_rng();
+
+    for j in (starty..endy).rev() {
+        for i in 0..nx {
+            let mut col = Vec3::new(0.0, 0.0, 0.0);
+            for _s in 0..ns {
+                let u = (f64::from(i) + rng.gen::<f64>()) / f64::from(nx);
+                let v = (f64::from(j) + rng.gen::<f64>()) / f64::from(ny);
+                let r = cam.get_ray(u, v);
+                col += color(&r, hitables, 0);
+            };
+
+            col /= f64::from(ns);
+            col.x = col.x.sqrt();
+            col.y = col.y.sqrt();
+            col.z = col.z.sqrt();
+            let ir = (255.99 * col.x) as i64;
+            let ig = (255.99 * col.y) as i64;
+            let ib = (255.99 * col.z) as i64;
+            file.push(format!("{} {} {}\n", ir, ig, ib))
+        }
+    }
+    file
+}
+
 fn main() {
     let nx = 1200;
     let ny = 800;
     let ns = 10;
-    let mut rng = thread_rng();
-    println!("P3\n{} {}\n255\n", nx, ny);
+    let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
 
-    let world = random_scene();
+    let world = Arc::new(random_scene());
 
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
@@ -121,24 +160,28 @@ fn main() {
         aperture, dist_to_focus
     );
 
-    for j in (0..ny).rev() {
-        for i in 0..nx {
-            let mut col = Vec3::new(0.0, 0.0, 0.0);
-            for _s in 0..ns {
-                let u = (f64::from(i) + rng.gen::<f64>()) / f64::from(nx);
-                let v = (f64::from(j) + rng.gen::<f64>()) / f64::from(ny);
-                let r = cam.get_ray(u, v);
-                col += color(&r, &world, 0);
-            };
+    let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];
+    let thread_count = 8;
+    let y_section_size = ny / thread_count;
+    let mut starty = ny - y_section_size;
+    let mut endy = ny;
+    for _render_thread_num in 0..thread_count {
+        let thread_world = world.clone();
+        let render_thread = thread::spawn(move || render(Scene {
+            nx, ny, ns, starty, endy,
+            cam: &cam,
+            hitables: &thread_world
+        }));
+        render_threads.push(render_thread);
+        endy = starty;
+        starty -= y_section_size;
+    }
 
-            col /= f64::from(ns);
-            col.x = col.x.sqrt();
-            col.y = col.y.sqrt();
-            col.z = col.z.sqrt();
-            let ir = (255.99 * col.x) as i64;
-            let ig = (255.99 * col.y) as i64;
-            let ib = (255.99 * col.z) as i64;
-            println!("{} {} {}\n", ir, ig, ib);
-        }
+    for render_thread in render_threads {
+        file.extend(render_thread.join().unwrap());
+    }
+
+    for string in file {
+        println!("{}", string);
     }
 }

@@ -8,6 +8,31 @@ book 1. But I plan on following along with book 2 and 3 as well.
 
 ## Performace
 
+**v1.1.0 (Multi Threaded):**
+
+After adding support for multi-threading, rustrace is now super *duper* fast.
+
+Benchmarks:
+
+Computer Info:
+- macOS 10.14.3 (18D109)
+- MacBook Pro (15-inch, 2018)
+- 2.6 GHz Intel Core i7
+- 16 GB 2400 MHz DDR4
+
+Rustracer:
+- Took 19.57 seconds.
+- Run using `cargo run --release > image.ppm` (Time above subtracts 0.86s build time)
+
+Reference:
+- Took 58.051 seconds.
+- Built using `g++ -O3 main.cc -o main`
+
+This is an unfair comparison now though because the reference implementation is
+single threaded.
+
+**v1.0.0 (Single Threaded):**
+
 Interestingly this implementation is slightly faster than the [C++ reference version](https://github.com/petershirley/raytracinginoneweekend).
 By slightly I mean *very* slightly, they are within seconds of each other.
 
