@@ -160,46 +160,26 @@ fn main() {
         aperture, dist_to_focus
     );
 
-    let thread_1_world = world.clone();
-    let render_thread_1 = thread::spawn(move || render(Scene {
-        nx, ny, ns,
-        starty: 600,
-        endy: 800,
-        cam: &cam,
-        hitables: &thread_1_world
-    }));
+    let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];
+    let thread_count = 4;
+    let y_section_size = ny / thread_count;
+    let mut starty = ny - y_section_size;
+    let mut endy = ny;
+    for _render_thread_num in 0..thread_count {
+        let thread_world = world.clone();
+        let render_thread = thread::spawn(move || render(Scene {
+            nx, ny, ns, starty, endy,
+            cam: &cam,
+            hitables: &thread_world
+        }));
+        render_threads.push(render_thread);
+        endy = starty;
+        starty -= y_section_size;
+    }
 
-    let thread_2_world = world.clone();
-    let render_thread_2 = thread::spawn(move || render(Scene {
-        nx, ny, ns,
-        starty: 400,
-        endy: 600,
-        cam: &cam,
-        hitables: &thread_2_world
-    }));
-
-    let thread_3_world = world.clone();
-    let render_thread_3 = thread::spawn(move || render(Scene {
-        nx, ny, ns,
-        starty: 200,
-        endy: 400,
-        cam: &cam,
-        hitables: &thread_3_world
-    }));
-
-    let thread_4_world = world.clone();
-    let render_thread_4 = thread::spawn(move || render(Scene {
-        nx, ny, ns,
-        starty: 0,
-        endy: 200,
-        cam: &cam,
-        hitables: &thread_4_world
-    }));
-
-    file.extend(render_thread_1.join().unwrap());
-    file.extend(render_thread_2.join().unwrap());
-    file.extend(render_thread_3.join().unwrap());
-    file.extend(render_thread_4.join().unwrap());
+    for render_thread in render_threads {
+        file.extend(render_thread.join().unwrap());
+    }
 
     for string in file {
         println!("{}", string);
