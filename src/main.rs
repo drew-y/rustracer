@@ -140,9 +140,9 @@ fn render<T: Hitable>(scene: Scene<T>) -> Vec<String> {
 }
 
 fn main() {
-    let nx = 1600;
+    let nx = 1200;
     let ny = 800;
-    let ns = 50;
+    let ns = 10;
     let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
 
     let world = Arc::new(random_scene());
