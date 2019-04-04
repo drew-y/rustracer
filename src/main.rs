@@ -11,7 +11,7 @@ use ray::Ray;
 use std::f64::MAX;
 use std::thread;
 use std::sync::Arc;
-use sphere::{ Sphere };
+use sphere::{ Sphere, MovingSphere };
 use camera::Camera;
 use rand::prelude::*;
 use material::Material::{ Lambertion, Metal, Dielectric };
@@ -30,17 +30,17 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
-fn random_scene() -> HitableList<Sphere> {
+fn random_scene() -> Arc<Hitable> {
     let mut rng = thread_rng();
     let mut rnd = || rng.gen::<f64>();
     let fl = |i: i32| f64::from(i);
-    let mut list = HitableList {
+    let mut list: HitableList<Box<Hitable>> = HitableList {
         list: vec![
-            Sphere {
+            Box::new(Sphere {
                 center: Vec3::new(0.0, -1000.0, 0.0),
                 radius: 1000.0,
                 material: Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
-            },
+            }),
         ]
     };
 
@@ -51,69 +51,72 @@ fn random_scene() -> HitableList<Sphere> {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 // Diffuse
                 if choose_mat < 0.8 {
-                    list.list.push(Sphere {
-                        center,
+                    list.push(Box::new(MovingSphere {
+                        center0: center,
+                        center1: center + Vec3::new(0.0, 0.5 * rnd(), 0.0),
+                        time0: 0.0,
+                        time1: 1.0,
                         radius: 0.2,
                         material: Lambertion { albedo: Vec3::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()) }
-                    });
+                    }));
                     continue;
                 };
 
                 if choose_mat < 0.95 { // Metal
-                    list.list.push(Sphere {
+                    list.push(Box::new(Sphere {
                         center,
                         radius: 0.2,
                         material: Metal {
                             albedo: Vec3::new(0.5 * (1.0 + rnd()), 0.5 * (1.0 + rnd()), 0.5 * (1.0 + rnd())),
                             fuzz: 0.5 * rnd()
                         }
-                    });
+                    }));
                     continue;
                 };
 
                 // Glass
-                list.list.push(Sphere {
+                list.push(Box::new(Sphere {
                     center, radius: 0.2,
                     material: Dielectric { ref_idx: 1.5 }
-                })
+                }))
             };
         };
     };
 
-    list.list.push(Sphere {
+    list.push(Box::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0,
         material: Dielectric { ref_idx: 1.5 }
-    });
+    }));
 
-    list.list.push(Sphere {
+    list.push(Box::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0,
         material: Lambertion { albedo: Vec3::new(0.4, 0.2, 0.1) }
-    });
+    }));
 
-    list.list.push(Sphere {
+    list.push(Box::new(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0,
         material: Metal {
             albedo: Vec3::new(0.7, 0.6, 0.5),
             fuzz: 0.0
         }
-    });
+    }));
 
-    list
+    Arc::new(list)
 }
 
-struct Scene<'a, T: Hitable> {
+struct Scene<'a> {
     starty: i32,
     endy: i32,
     nx: i32,
     ny: i32,
     ns: i32,
     cam: &'a Camera,
-    hitables: &'a HitableList<T>
+    hitable: Arc<Hitable>
 }
 
-fn render<T: Hitable>(scene: Scene<T>) -> Vec<String> {
+fn render<T: Hitable>(scene: Scene) -> Vec<String> {
     let mut file: Vec<String> = vec![];
-    let Scene { ns, nx, ny, cam, hitables, starty, endy } = scene;
+    let Scene { ns, nx, ny, cam, hitable, starty, endy } = scene;
     let mut rng = thread_rng();
 
     for j in (starty..endy).rev() {
@@ -123,7 +126,7 @@ fn render<T: Hitable>(scene: Scene<T>) -> Vec<String> {
                 let u = (f64::from(i) + rng.gen::<f64>()) / f64::from(nx);
                 let v = (f64::from(j) + rng.gen::<f64>()) / f64::from(ny);
                 let r = cam.get_ray(u, v);
-                col += color(&r, hitables, 0);
+                col += color(&r, &hitable, 0);
             };
 
             col /= f64::from(ns);
@@ -145,7 +148,7 @@ fn main() {
     let ns = 10;
     let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
 
-    let world = Arc::new(random_scene());
+    let world = random_scene();
 
     let lookfrom = Vec3::new(13.0, 2.0, 3.0);
     let lookat = Vec3::new(0.0, 0.0, 0.0);
@@ -157,7 +160,7 @@ fn main() {
         Vec3::new(0.0, 1.0, 0.0),
         20.0,
         f64::from(nx) / f64::from(ny),
-        aperture, dist_to_focus
+        aperture, dist_to_focus, 0.0, 1.0
     );
 
     let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];
@@ -167,10 +170,10 @@ fn main() {
     let mut endy = ny;
     for _render_thread_num in 0..thread_count {
         let thread_world = world.clone();
-        let render_thread = thread::spawn(move || render(Scene {
+        let render_thread = thread::spawn(move || render::<Arc<Hitable>>(Scene {
             nx, ny, ns, starty, endy,
             cam: &cam,
-            hitables: &thread_world
+            hitable: thread_world
         }));
         render_threads.push(render_thread);
         endy = starty;

@@ -12,11 +12,11 @@ pub enum Material {
 }
 
 impl Material {
-    fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Vec3) -> Option<(Vec3, Ray)> {
+    fn lambertion_scatter(r: &Ray, rec: &HitRecord, albedo: &Vec3) -> Option<(Vec3, Ray)> {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return Some((
             *albedo,
-            Ray { origin: rec.p, direction: target - rec.p }
+            Ray { origin: rec.p, direction: target - rec.p, time: r.time }
         ))
     }
 
@@ -37,7 +37,8 @@ impl Material {
         let reflected = Material::reflect(&unit_vector(&r.direction), &rec.normal);
         let scattered = Ray {
             origin: rec.p,
-            direction: reflected + fuzz * random_in_unit_sphere()
+            direction: reflected + fuzz * random_in_unit_sphere(),
+            time: r.time
         };
 
         if dot(&scattered.direction, &rec.normal) > 0.0 {
@@ -67,11 +68,13 @@ impl Material {
         if let Some(refracted) = Material::refract(&r.direction, &outward_normal, ni_over_nt) {
             let reflect_prob = Material::schlick(cosine, ref_idx);
             if rng.gen::<f64>() >= reflect_prob {
-                return Some((attenuation, Ray { origin: rec.p, direction: refracted }))
+                return Some((attenuation, Ray {
+                    origin: rec.p, direction: refracted, time: r.time
+                }))
             }
         }
 
-        Some((attenuation, Ray { origin: rec.p, direction: reflected }))
+        Some((attenuation, Ray { origin: rec.p, direction: reflected, time: r.time }))
     }
 
     pub fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Vec3, Ray)> {
