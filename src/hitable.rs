@@ -17,10 +17,14 @@ pub struct HitRecord<'a> {
 }
 
 pub struct HitableList<T: Hitable> {
-    pub list: Vec<T>
+    list: Vec<T>
 }
 
 impl<T: Hitable> HitableList<T> {
+    pub fn new() -> HitableList<T> {
+        HitableList { list: Vec::new() }
+    }
+
     pub fn push(&mut self, v: T) {
         self.list.push(v);
     }

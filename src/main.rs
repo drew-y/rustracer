@@ -12,7 +12,7 @@ use std::f64::MAX;
 use std::thread;
 use std::sync::Arc;
 use sphere::{ Sphere, MovingSphere };
-use camera::Camera;
+use camera::{ Camera, CameraOpts };
 use rand::prelude::*;
 use material::Material::{ Lambertion, Metal, Dielectric };
 
@@ -34,16 +34,9 @@ fn random_scene() -> Arc<Hitable> {
     let mut rng = thread_rng();
     let mut rnd = || rng.gen::<f64>();
     let fl = |i: i32| f64::from(i);
-    let mut list: HitableList<Box<Hitable>> = HitableList {
-        list: vec![
-            Box::new(Sphere {
-                center: Vec3::new(0.0, -1000.0, 0.0),
-                radius: 1000.0,
-                material: Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
-            }),
-        ]
-    };
+    let mut list = HitableList::<Box<Hitable>>::new();
 
+    // Generate random spheres
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = rnd();
@@ -83,6 +76,14 @@ fn random_scene() -> Arc<Hitable> {
         };
     };
 
+    // Floor
+    list.push(Box::new(Sphere {
+        center: Vec3::new(0.0, -1000.0, 0.0),
+        radius: 1000.0,
+        material: Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
+    }));
+
+    // Big sphere trio
     list.push(Box::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0,
         material: Dielectric { ref_idx: 1.5 }
@@ -150,18 +151,13 @@ fn main() {
 
     let world = random_scene();
 
-    let lookfrom = Vec3::new(13.0, 2.0, 3.0);
-    let lookat = Vec3::new(0.0, 0.0, 0.0);
-    let dist_to_focus = 10.0;
-    let aperture = 0.1;
-
-    let cam = Camera::new(
-        lookfrom, lookat,
-        Vec3::new(0.0, 1.0, 0.0),
-        20.0,
-        f64::from(nx) / f64::from(ny),
-        aperture, dist_to_focus, 0.0, 1.0
-    );
+    let cam = Camera::new(CameraOpts {
+        lookfrom: Vec3::new(13.0, 2.0, 3.0),
+        lookat: Vec3::new(0.0, 0.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aspect: f64::from(nx) / f64::from(ny),
+        focus_dist: 10.0, aperture: 0.1, vfow: 20.0, time0: 0.0, time1: 1.0
+    });
 
     let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];
     let thread_count = 8;

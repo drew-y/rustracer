@@ -5,16 +5,28 @@ use super::ray::Ray;
 
 #[derive(Copy, Clone, Debug)]
 pub struct Camera {
-    pub lower_left_corner: Vec3,
-    pub horizontal: Vec3,
-    pub vertical: Vec3,
-    pub origin: Vec3,
+    lower_left_corner: Vec3,
+    horizontal: Vec3,
+    vertical: Vec3,
+    origin: Vec3,
     lens_radius: f64,
-    pub time0: f64,
-    pub time1: f64,
+    time0: f64,
+    time1: f64,
     w: Vec3,
     u: Vec3,
     v: Vec3
+}
+
+pub struct CameraOpts {
+    pub lookfrom: Vec3,
+    pub lookat: Vec3,
+    pub vup: Vec3,
+    pub vfow: f64,
+    pub aspect: f64,
+    pub aperture: f64,
+    pub focus_dist: f64,
+    pub time0: f64,
+    pub time1: f64
 }
 
 impl Camera {
@@ -27,11 +39,10 @@ impl Camera {
         p
     }
 
-    pub fn new(
-        lookfrom: Vec3, lookat: Vec3, vup: Vec3, vfow: f64,
-        aspect: f64, aperture: f64, focus_dist: f64,
-        time0: f64, time1: f64
-    ) -> Camera {
+    pub fn new(CameraOpts {
+        lookfrom, lookat, vup, vfow, aspect, aperture, focus_dist,
+        time0, time1
+    }: CameraOpts) -> Camera {
         let theta = vfow * PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect * half_height;
