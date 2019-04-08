@@ -26,6 +26,16 @@ impl Vec3 {
         self.y *= k;
         self.z *= k;
     }
+
+    /// Field access by index 0: x, 1: y, 2: z
+    pub fn index(&self, i: i32) -> Option<f64> {
+        match i {
+            0 => Some(self.x),
+            1 => Some(self.y),
+            2 => Some(self.z),
+            _ => None
+        }
+    }
 }
 
 pub fn dot(v1: &Vec3, v2: &Vec3) -> f64 {

@@ -1,7 +1,7 @@
 use super::vec3::{ Vec3, dot, unit_vector };
 use super::hitable::HitRecord;
 use super::ray::Ray;
-use super::sphere::random_in_unit_sphere;
+use super::utils::random_in_unit_sphere;
 use rand::prelude::*;
 
 #[derive(Copy, Clone, Debug)]

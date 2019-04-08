@@ -1,7 +1,6 @@
-use super::hitable::{ Hitable, HitRecord };
+use super::hitable::{ Hitable, HitRecord, AABB };
 use super::vec3::{ Vec3, dot, };
 use super::ray::Ray;
-use rand::prelude::*;
 use super::material::Material;
 use std::ops::Deref;
 
@@ -35,21 +34,23 @@ impl Hitable for Sphere {
         };
         None
     }
+
+    fn bounding_box(&self, t0: f64, t1: f64) -> Option<AABB> {
+        Some(AABB {
+            min: self.center - Vec3::new(self.radius, self.radius, self.radius),
+            max: self.center + Vec3::new(self.radius, self.radius, self.radius)
+        })
+    }
 }
 
 impl Hitable for Box<Sphere> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.deref().hit(r, t_min, t_max)
     }
-}
 
-pub fn random_in_unit_sphere() -> Vec3 {
-    let mut rng = thread_rng();
-    let mut rnd = || rng.gen::<f64>();
-    let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), rnd()) - Vec3::new(1.0, 1.0, 1.0);
-    let mut p = sample();
-    while p.squared_length() >= 1.0 { p = sample(); }
-    p
+    fn bounding_box(&self, t0: f64, t1: f64) -> Option<AABB> {
+        self.deref().bounding_box(t0, t1)
+    }
 }
 
 pub struct MovingSphere {
@@ -65,6 +66,13 @@ impl MovingSphere {
     fn center(&self, time: f64) -> Vec3 {
         self.center0 + ((time - self.time0) /
             (self.time1 - self.time0) * (self.center1 - self.center0))
+    }
+
+    fn bounding_box_at_time(&self, time: f64, t0: f64, t1: f64) -> AABB {
+        AABB {
+            min: self.center(time) - Vec3::new(self.radius, self.radius, self.radius),
+            max: self.center(time) + Vec3::new(self.radius, self.radius, self.radius)
+        }
     }
 }
 
@@ -92,10 +100,20 @@ impl Hitable for MovingSphere {
         };
         None
     }
+
+    fn bounding_box(&self, t0: f64, t1: f64) -> Option<AABB> {
+        let bbox0 = self.bounding_box_at_time(self.time0, t0, t1);
+        let bbox1 = self.bounding_box_at_time(self.time1, t0, t1);
+        Some(AABB::surrounding_box(&bbox0, &bbox1))
+    }
 }
 
 impl Hitable for Box<MovingSphere> {
     fn hit(&self, r: &Ray, t_min: f64, t_max: f64) -> Option<HitRecord> {
         self.deref().hit(r, t_min, t_max)
+    }
+
+    fn bounding_box(&self, t0: f64, t1: f64) -> Option<AABB> {
+        self.deref().bounding_box(t0, t1)
     }
 }
