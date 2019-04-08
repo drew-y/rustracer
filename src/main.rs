@@ -7,6 +7,7 @@ mod material;
 mod utils;
 mod bvh;
 mod aabb;
+mod texture;
 
 use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable, HitableList };
@@ -18,6 +19,7 @@ use sphere::{ Sphere, MovingSphere };
 use camera::{ Camera, CameraOpts };
 use rand::prelude::*;
 use material::Material::{ Lambertion, Metal, Dielectric };
+use texture::{ ConstantTexture, CheckerTexture };
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
@@ -53,7 +55,9 @@ fn random_scene() -> Arc<Hitable> {
                         time0: 0.0,
                         time1: 1.0,
                         radius: 0.2,
-                        material: Lambertion { albedo: Vec3::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()) }
+                        material: Lambertion {
+                            albedo: Arc::new(ConstantTexture::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()))
+                        }
                     }));
                     continue;
                 };
@@ -79,11 +83,16 @@ fn random_scene() -> Arc<Hitable> {
         };
     };
 
+    let floor_texture = Arc::new(CheckerTexture {
+        odd: Arc::new(ConstantTexture::new(0.2, 0.3, 0.1)),
+        even: Arc::new(ConstantTexture::new(0.9, 0.9, 0.9)),
+    });
+
     // Floor
     list.push(Box::new(Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
-        material: Lambertion { albedo: Vec3::new(0.5, 0.5, 0.5) }
+        material: Lambertion { albedo: floor_texture }
     }));
 
     // Big sphere trio
@@ -94,7 +103,9 @@ fn random_scene() -> Arc<Hitable> {
 
     list.push(Box::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0,
-        material: Lambertion { albedo: Vec3::new(0.4, 0.2, 0.1) }
+        material: Lambertion {
+            albedo: Arc::new(ConstantTexture::new(0.4, 0.2, 0.1))
+        }
     }));
 
     list.push(Box::new(Sphere {

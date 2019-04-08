@@ -3,19 +3,20 @@ use super::hitable::HitRecord;
 use super::ray::Ray;
 use super::utils::random_in_unit_sphere;
 use rand::prelude::*;
+use super::texture::Texture;
+use std::sync::Arc;
 
-#[derive(Copy, Clone, Debug)]
 pub enum Material {
-    Lambertion { albedo: Vec3 },
+    Lambertion { albedo: Arc<Texture> },
     Metal { albedo: Vec3, fuzz: f64 },
     Dielectric { ref_idx: f64 }
 }
 
 impl Material {
-    fn lambertion_scatter(r: &Ray, rec: &HitRecord, albedo: &Vec3) -> Option<(Vec3, Ray)> {
+    fn lambertion_scatter(r: &Ray, rec: &HitRecord, albedo: &Arc<Texture>) -> Option<(Vec3, Ray)> {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return Some((
-            *albedo,
+            albedo.value(0.0, 0.0, rec.p),
             Ray { origin: rec.p, direction: target - rec.p, time: r.time }
         ))
     }
