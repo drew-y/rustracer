@@ -12,7 +12,7 @@ pub struct BVHNode {
 }
 
 impl BVHNode {
-    fn new(list: &mut [Arc<Hitable>], time0: f64, time1: f64) -> BVHNode {
+    pub fn new(list: &mut [Arc<Hitable>], time0: f64, time1: f64) -> BVHNode {
         let mut rng = thread_rng();
         let axis = (3.0 * rng.gen::<f64>()) as i32;
 
