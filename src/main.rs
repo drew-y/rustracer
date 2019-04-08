@@ -5,6 +5,8 @@ mod sphere;
 mod camera;
 mod material;
 mod utils;
+mod bvh;
+mod aabb;
 
 use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable, HitableList };

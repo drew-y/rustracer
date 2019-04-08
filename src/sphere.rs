@@ -1,7 +1,8 @@
-use super::hitable::{ Hitable, HitRecord, AABB };
+use super::hitable::{ Hitable, HitRecord };
 use super::vec3::{ Vec3, dot, };
 use super::ray::Ray;
 use super::material::Material;
+use super::aabb::AABB;
 use std::ops::Deref;
 
 pub struct Sphere {
@@ -35,7 +36,7 @@ impl Hitable for Sphere {
         None
     }
 
-    fn bounding_box(&self, t0: f64, t1: f64) -> Option<AABB> {
+    fn bounding_box(&self, _t0: f64, _t1: f64) -> Option<AABB> {
         Some(AABB {
             min: self.center - Vec3::new(self.radius, self.radius, self.radius),
             max: self.center + Vec3::new(self.radius, self.radius, self.radius)
@@ -68,7 +69,7 @@ impl MovingSphere {
             (self.time1 - self.time0) * (self.center1 - self.center0))
     }
 
-    fn bounding_box_at_time(&self, time: f64, t0: f64, t1: f64) -> AABB {
+    fn bounding_box_at_time(&self, time: f64, _t0: f64, _t1: f64) -> AABB {
         AABB {
             min: self.center(time) - Vec3::new(self.radius, self.radius, self.radius),
             max: self.center(time) + Vec3::new(self.radius, self.radius, self.radius)
