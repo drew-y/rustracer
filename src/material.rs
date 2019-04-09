@@ -4,16 +4,15 @@ use super::ray::Ray;
 use super::utils::random_in_unit_sphere;
 use rand::prelude::*;
 use super::texture::Texture;
-use std::sync::Arc;
 
 pub enum Material {
-    Lambertion { albedo: Arc<Texture> },
+    Lambertion { albedo: Box<Texture> },
     Metal { albedo: Vec3, fuzz: f32 },
     Dielectric { ref_idx: f32 }
 }
 
 impl Material {
-    fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Arc<Texture>) -> Option<(Vec3, Ray)> {
+    fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return Some((
             albedo.value(0.0, 0.0, rec.p),

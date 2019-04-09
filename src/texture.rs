@@ -37,8 +37,8 @@ impl Texture for ConstantTexture {
 }
 
 pub struct CheckerTexture {
-    pub odd: Arc<Texture>,
-    pub even: Arc<Texture>
+    pub odd: Box<Texture>,
+    pub even: Box<Texture>
 }
 
 impl Texture for CheckerTexture {

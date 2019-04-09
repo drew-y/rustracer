@@ -29,7 +29,7 @@ fn main() {
     let ns: i32 = 10;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let world = Arc::new(BVHNode::new(&mut random_scene()));
+    let world = Arc::new(BVHNode::new(random_scene()));
 
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(13.0, 2.0, 3.0),
