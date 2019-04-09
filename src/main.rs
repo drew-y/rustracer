@@ -12,17 +12,17 @@ mod texture;
 use vec3::{ Vec3, unit_vector };
 use hitable::{ Hitable };
 use ray::Ray;
-use std::f64::MAX;
+use std::f32::MAX;
 use std::thread;
 use std::sync::Arc;
-use sphere::{ Sphere, MovingSphere };
+use sphere::{ Sphere };
 use camera::{ Camera, CameraOpts };
 use rand::prelude::*;
 use material::Material::{ Lambertion, Metal, Dielectric };
 use texture::{ ConstantTexture, CheckerTexture };
 use bvh::BVHNode;
 
-fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
+fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
         if depth >= 50 { return Vec3::new(0.0, 0.0, 0.0); }
         if let Some((attenuation, scattered)) = rec.material.scatter(r, &rec) {
@@ -38,8 +38,8 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
 
 fn random_scene() -> Box<Vec<Arc<Hitable>>> {
     let mut rng = thread_rng();
-    let mut rnd = || rng.gen::<f64>();
-    let fl = |i: i32| f64::from(i);
+    let mut rnd = || rng.gen::<f32>();
+    let fl = |i: i32| i as f32;
     let mut list: Vec<Arc<Hitable>> = vec![];
 
     // Generate random spheres
@@ -50,11 +50,8 @@ fn random_scene() -> Box<Vec<Arc<Hitable>>> {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 // Diffuse
                 if choose_mat < 0.8 {
-                    list.push(Arc::new(MovingSphere {
-                        center0: center,
-                        center1: center + Vec3::new(0.0, 0.5 * rnd(), 0.0),
-                        time0: 0.0,
-                        time1: 1.0,
+                    list.push(Arc::new(Sphere {
+                        center,
                         radius: 0.2,
                         material: Lambertion {
                             albedo: Arc::new(ConstantTexture::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()))
@@ -139,19 +136,19 @@ fn render<T: Hitable>(scene: Scene) -> Vec<String> {
         for i in 0..nx {
             let mut col = Vec3::new(0.0, 0.0, 0.0);
             for _s in 0..ns {
-                let u = (f64::from(i) + rng.gen::<f64>()) / f64::from(nx);
-                let v = (f64::from(j) + rng.gen::<f64>()) / f64::from(ny);
+                let u = (i as f32 + rng.gen::<f32>()) / nx as f32;
+                let v = (j as f32 + rng.gen::<f32>()) / ny as f32;
                 let r = cam.get_ray(u, v);
                 col += color(&r, &hitable, 0);
             };
 
-            col /= f64::from(ns);
+            col /= ns as f32;
             col.x = col.x.sqrt();
             col.y = col.y.sqrt();
             col.z = col.z.sqrt();
-            let ir = (255.99 * col.x) as i64;
-            let ig = (255.99 * col.y) as i64;
-            let ib = (255.99 * col.z) as i64;
+            let ir = (255.99 * col.x) as i32;
+            let ig = (255.99 * col.y) as i32;
+            let ib = (255.99 * col.z) as i32;
             file.push(format!("{} {} {}\n", ir, ig, ib))
         }
     }
@@ -164,14 +161,14 @@ fn main() {
     let ns = 10;
     let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
 
-    let world = Arc::new(BVHNode::new(&mut random_scene(), 0.0, 1.0));
+    let world = Arc::new(BVHNode::new(&mut random_scene()));
 
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(13.0, 2.0, 3.0),
         lookat: Vec3::new(0.0, 0.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
-        aspect: f64::from(nx) / f64::from(ny),
-        focus_dist: 10.0, aperture: 0.1, vfow: 20.0, time0: 0.0, time1: 1.0
+        aspect: nx as f32 / ny as f32,
+        focus_dist: 10.0, aperture: 0.1, vfow: 20.0
     });
 
     let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];

@@ -3,17 +3,17 @@ use std::ops::Deref;
 use std::sync::Arc;
 
 pub trait Texture: Sync + Send {
-    fn value(&self, u: f64, v: f64, p: Vec3) -> Vec3;
+    fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3;
 }
 
 impl<T: Texture> Texture for Box<T> {
-    fn value(&self, u: f64, v: f64, p: Vec3) -> Vec3 {
+    fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
         self.deref().value(u, v, p)
     }
 }
 
 impl<T: Texture> Texture for Arc<T> {
-    fn value(&self, u: f64, v: f64, p: Vec3) -> Vec3 {
+    fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
         self.deref().value(u, v, p)
     }
 }
@@ -23,7 +23,7 @@ pub struct ConstantTexture {
 }
 
 impl ConstantTexture {
-    pub fn new(r: f64, g: f64, b: f64) -> Self {
+    pub fn new(r: f32, g: f32, b: f32) -> Self {
         ConstantTexture {
             color: Vec3::new(r, g, b)
         }
@@ -31,7 +31,7 @@ impl ConstantTexture {
 }
 
 impl Texture for ConstantTexture {
-    fn value(&self, u: f64, v: f64, p: Vec3) -> Vec3 {
+    fn value(&self, _u: f32, _v: f32, _p: Vec3) -> Vec3 {
         self.color
     }
 }
@@ -42,7 +42,7 @@ pub struct CheckerTexture {
 }
 
 impl Texture for CheckerTexture {
-    fn value(&self, u: f64, v: f64, p: Vec3) -> Vec3 {
+    fn value(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
         let sines = (p.x * 10.0).sin() * (p.y * 10.0).sin() * (p.z * 10.0).sin();
         if sines < 0.0 {
             self.odd.value(u, v, p)

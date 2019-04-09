@@ -8,16 +8,16 @@ use std::sync::Arc;
 
 pub enum Material {
     Lambertion { albedo: Arc<Texture> },
-    Metal { albedo: Vec3, fuzz: f64 },
-    Dielectric { ref_idx: f64 }
+    Metal { albedo: Vec3, fuzz: f32 },
+    Dielectric { ref_idx: f32 }
 }
 
 impl Material {
-    fn lambertion_scatter(r: &Ray, rec: &HitRecord, albedo: &Arc<Texture>) -> Option<(Vec3, Ray)> {
+    fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Arc<Texture>) -> Option<(Vec3, Ray)> {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return Some((
             albedo.value(0.0, 0.0, rec.p),
-            Ray { origin: rec.p, direction: target - rec.p, time: r.time }
+            Ray { origin: rec.p, direction: target - rec.p }
         ))
     }
 
@@ -25,7 +25,7 @@ impl Material {
         v - 2.0 * dot(v, n) * n
     }
 
-    fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f64) -> Option<Vec3> {
+    fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
         let uv = unit_vector(v);
         let dt = dot(&uv, n);
         let discriminant = 1.0 - ni_over_nt * ni_over_nt * ( 1.0 - dt * dt);
@@ -34,12 +34,11 @@ impl Material {
         } else { None }
     }
 
-    fn metal_scatter(r: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f64) -> Option<(Vec3, Ray)> {
+    fn metal_scatter(r: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f32) -> Option<(Vec3, Ray)> {
         let reflected = Material::reflect(&unit_vector(&r.direction), &rec.normal);
         let scattered = Ray {
             origin: rec.p,
-            direction: reflected + fuzz * random_in_unit_sphere(),
-            time: r.time
+            direction: reflected + fuzz * random_in_unit_sphere()
         };
 
         if dot(&scattered.direction, &rec.normal) > 0.0 {
@@ -47,13 +46,13 @@ impl Material {
         } else { None }
     }
 
-    fn schlick(cosine: f64, ref_idx: f64) -> f64 {
+    fn schlick(cosine: f32, ref_idx: f32) -> f32 {
         let mut r0 = (1.0 - ref_idx) / (1.0 * ref_idx);
         r0 = r0 * r0;
         r0 + (1.0 - r0) * (1.0 - cosine).powi(5)
     }
 
-    fn dielectric_scatter(r: &Ray, rec: &HitRecord, ref_idx: f64) -> Option<(Vec3, Ray)> {
+    fn dielectric_scatter(r: &Ray, rec: &HitRecord, ref_idx: f32) -> Option<(Vec3, Ray)> {
         let reflected = Material::reflect(&r.direction, &rec.normal);
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
 
@@ -68,14 +67,12 @@ impl Material {
         let mut rng = thread_rng();
         if let Some(refracted) = Material::refract(&r.direction, &outward_normal, ni_over_nt) {
             let reflect_prob = Material::schlick(cosine, ref_idx);
-            if rng.gen::<f64>() >= reflect_prob {
-                return Some((attenuation, Ray {
-                    origin: rec.p, direction: refracted, time: r.time
-                }))
+            if rng.gen::<f32>() >= reflect_prob {
+                return Some((attenuation, Ray { origin: rec.p, direction: refracted }))
             }
         }
 
-        Some((attenuation, Ray { origin: rec.p, direction: reflected, time: r.time }))
+        Some((attenuation, Ray { origin: rec.p, direction: reflected }))
     }
 
     pub fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Vec3, Ray)> {

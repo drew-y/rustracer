@@ -25,7 +25,7 @@ impl AABB {
     }
 
     /// If we hit returns a tuple of (tmin, tmax)
-    pub fn hit(&self, r: &Ray, tmin: f64, tmax: f64) -> Option<(f64, f64)> {
+    pub fn hit(&self, r: &Ray, tmin: f32, tmax: f32) -> Option<(f32, f32)> {
         let mut new_tmin = tmin;
         let mut new_tmax = tmax;
         for i in 0..3 {
