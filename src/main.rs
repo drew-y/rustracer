@@ -10,7 +10,7 @@ mod aabb;
 mod texture;
 
 use vec3::{ Vec3, unit_vector };
-use hitable::{ Hitable, HitableList };
+use hitable::{ Hitable };
 use ray::Ray;
 use std::f64::MAX;
 use std::thread;
@@ -20,6 +20,7 @@ use camera::{ Camera, CameraOpts };
 use rand::prelude::*;
 use material::Material::{ Lambertion, Metal, Dielectric };
 use texture::{ ConstantTexture, CheckerTexture };
+use bvh::BVHNode;
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
@@ -35,11 +36,11 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i64) -> Vec3 {
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
-fn random_scene() -> Arc<Hitable> {
+fn random_scene() -> Box<Vec<Arc<Hitable>>> {
     let mut rng = thread_rng();
     let mut rnd = || rng.gen::<f64>();
     let fl = |i: i32| f64::from(i);
-    let mut list = HitableList::<Box<Hitable>>::new();
+    let mut list: Vec<Arc<Hitable>> = vec![];
 
     // Generate random spheres
     for a in -11..11 {
@@ -49,7 +50,7 @@ fn random_scene() -> Arc<Hitable> {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 // Diffuse
                 if choose_mat < 0.8 {
-                    list.push(Box::new(MovingSphere {
+                    list.push(Arc::new(MovingSphere {
                         center0: center,
                         center1: center + Vec3::new(0.0, 0.5 * rnd(), 0.0),
                         time0: 0.0,
@@ -63,7 +64,7 @@ fn random_scene() -> Arc<Hitable> {
                 };
 
                 if choose_mat < 0.95 { // Metal
-                    list.push(Box::new(Sphere {
+                    list.push(Arc::new(Sphere {
                         center,
                         radius: 0.2,
                         material: Metal {
@@ -75,7 +76,7 @@ fn random_scene() -> Arc<Hitable> {
                 };
 
                 // Glass
-                list.push(Box::new(Sphere {
+                list.push(Arc::new(Sphere {
                     center, radius: 0.2,
                     material: Dielectric { ref_idx: 1.5 }
                 }))
@@ -89,26 +90,26 @@ fn random_scene() -> Arc<Hitable> {
     });
 
     // Floor
-    list.push(Box::new(Sphere {
+    list.push(Arc::new(Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
         material: Lambertion { albedo: floor_texture }
     }));
 
     // Big sphere trio
-    list.push(Box::new(Sphere {
+    list.push(Arc::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0,
         material: Dielectric { ref_idx: 1.5 }
     }));
 
-    list.push(Box::new(Sphere {
+    list.push(Arc::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0,
         material: Lambertion {
             albedo: Arc::new(ConstantTexture::new(0.4, 0.2, 0.1))
         }
     }));
 
-    list.push(Box::new(Sphere {
+    list.push(Arc::new(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0,
         material: Metal {
             albedo: Vec3::new(0.7, 0.6, 0.5),
@@ -116,7 +117,7 @@ fn random_scene() -> Arc<Hitable> {
         }
     }));
 
-    Arc::new(list)
+    Box::new(list)
 }
 
 struct Scene<'a> {
@@ -163,7 +164,7 @@ fn main() {
     let ns = 10;
     let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
 
-    let world = random_scene();
+    let world = Arc::new(BVHNode::new(&mut random_scene(), 0.0, 1.0));
 
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(13.0, 2.0, 3.0),
