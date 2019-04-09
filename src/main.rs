@@ -21,6 +21,9 @@ use rand::prelude::*;
 use material::Material::{ Lambertion, Metal, Dielectric };
 use texture::{ ConstantTexture, CheckerTexture };
 use bvh::BVHNode;
+use std::io;
+use std::io::BufWriter;
+use png::HasParameters;
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
@@ -127,8 +130,8 @@ struct Scene<'a> {
     hitable: Arc<Hitable>
 }
 
-fn render<T: Hitable>(scene: Scene) -> Vec<String> {
-    let mut file: Vec<String> = vec![];
+fn render<T: Hitable>(scene: Scene) -> Vec<u8> {
+    let mut file: Vec<u8> = vec![];
     let Scene { ns, nx, ny, cam, hitable, starty, endy } = scene;
     let mut rng = thread_rng();
 
@@ -146,10 +149,9 @@ fn render<T: Hitable>(scene: Scene) -> Vec<String> {
             col.x = col.x.sqrt();
             col.y = col.y.sqrt();
             col.z = col.z.sqrt();
-            let ir = (255.99 * col.x) as i32;
-            let ig = (255.99 * col.y) as i32;
-            let ib = (255.99 * col.z) as i32;
-            file.push(format!("{} {} {}\n", ir, ig, ib))
+            file.push((255.99 * col.x) as u8);
+            file.push((255.99 * col.y) as u8);
+            file.push((255.99 * col.z) as u8);
         }
     }
     file
@@ -159,7 +161,7 @@ fn main() {
     let nx = 1200;
     let ny = 800;
     let ns = 10;
-    let mut file = vec![format!("P3\n{} {}\n255\n", nx, ny)];
+    let mut file: Vec<u8> = vec![];
 
     let world = Arc::new(BVHNode::new(&mut random_scene()));
 
@@ -171,7 +173,7 @@ fn main() {
         focus_dist: 10.0, aperture: 0.1, vfow: 20.0
     });
 
-    let mut render_threads: Vec<thread::JoinHandle<Vec<String>>> = vec![];
+    let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> = vec![];
     let thread_count = 8;
     let y_section_size = ny / thread_count;
     let mut starty = ny - y_section_size;
@@ -192,7 +194,9 @@ fn main() {
         file.extend(render_thread.join().unwrap());
     }
 
-    for string in file {
-        println!("{}", string);
-    }
+    let ref mut w = BufWriter::new(io::stdout());
+    let mut encoder = png::Encoder::new(w, nx as u32, ny as u32);
+    encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
+    let mut writer = encoder.write_header().unwrap();
+    writer.write_image_data(&file).unwrap();
 }
