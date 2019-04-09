@@ -1,4 +1,4 @@
-use std::f64::consts::PI;
+use std::f32::consts::PI;
 use rand::prelude::*;
 use super::vec3::{ Vec3, cross, unit_vector, dot };
 use super::ray::Ray;
@@ -9,9 +9,7 @@ pub struct Camera {
     horizontal: Vec3,
     vertical: Vec3,
     origin: Vec3,
-    lens_radius: f64,
-    time0: f64,
-    time1: f64,
+    lens_radius: f32,
     w: Vec3,
     u: Vec3,
     v: Vec3
@@ -21,18 +19,16 @@ pub struct CameraOpts {
     pub lookfrom: Vec3,
     pub lookat: Vec3,
     pub vup: Vec3,
-    pub vfow: f64,
-    pub aspect: f64,
-    pub aperture: f64,
-    pub focus_dist: f64,
-    pub time0: f64,
-    pub time1: f64
+    pub vfow: f32,
+    pub aspect: f32,
+    pub aperture: f32,
+    pub focus_dist: f32
 }
 
 impl Camera {
     fn ranom_in_unit_disk() -> Vec3 {
         let mut rng = thread_rng();
-        let mut rnd = || rng.gen::<f64>();
+        let mut rnd = || rng.gen::<f32>();
         let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
         let mut p = sample();
         while dot(&p, &p) >= 1.0 { p = sample() };
@@ -40,8 +36,7 @@ impl Camera {
     }
 
     pub fn new(CameraOpts {
-        lookfrom, lookat, vup, vfow, aspect, aperture, focus_dist,
-        time0, time1
+        lookfrom, lookat, vup, vfow, aspect, aperture, focus_dist
     }: CameraOpts) -> Camera {
         let theta = vfow * PI / 180.0;
         let half_height = (theta / 2.0).tan();
@@ -55,20 +50,17 @@ impl Camera {
             vertical: 2.0 * half_height * v * focus_dist,
             origin: lookfrom,
             lens_radius: aperture / 2.0,
-            w, u, v, time0, time1
+            w, u, v
         }
     }
 
-    pub fn get_ray(&self, s: f64, t: f64) -> Ray {
-        let mut rng = thread_rng();
+    pub fn get_ray(&self, s: f32, t: f32) -> Ray {
         let rd = self.lens_radius * Camera::ranom_in_unit_disk();
         let offset = self.u * rd.x + self.v * rd.y;
-        let time = self.time0 + rng.gen::<f64>() * (self.time1 - self.time0);
         Ray {
             origin: self.origin + offset,
             direction: self.lower_left_corner + s * self.horizontal +
                 t * self.vertical - self.origin - offset,
-            time
         }
     }
 }
