@@ -31,7 +31,11 @@ pub struct Scene<'a> {
 }
 
 pub fn render<T: Hitable>(scene: Scene) -> Vec<u8> {
-    let mut file: Vec<u8> = vec![];
+    let mut file: Vec<u8> = Vec::with_capacity(
+        (scene.endy - scene.starty) as usize *
+        scene.nx as usize *
+        3
+    );
     let Scene { ns, nx, ny, cam, hitable, starty, endy } = scene;
     let mut rng = thread_rng();
 

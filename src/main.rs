@@ -24,10 +24,10 @@ use scene::random_scene;
 use render::{ Scene, render };
 
 fn main() {
-    let nx = 1200;
-    let ny = 800;
-    let ns = 10;
-    let mut file: Vec<u8> = vec![];
+    let nx: i32 = 1200;
+    let ny: i32 = 800;
+    let ns: i32 = 10;
+    let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
     let world = Arc::new(BVHNode::new(&mut random_scene()));
 
@@ -39,8 +39,9 @@ fn main() {
         focus_dist: 10.0, aperture: 0.1, vfow: 20.0
     });
 
-    let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> = vec![];
     let thread_count = 8;
+    let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> =
+        Vec::with_capacity(thread_count as usize);
     let y_section_size = ny / thread_count;
     let mut starty = ny - y_section_size;
     let mut endy = ny;
