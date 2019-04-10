@@ -37,7 +37,7 @@ fn main() {
         lookat: Vec3::new(0.0, 2.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
-        focus_dist: 13.0, aperture: 2.0, vfow: 40.0
+        focus_dist: 13.0, aperture: 0.00001, vfow: 40.0
     });
 
     let thread_count = 8;
