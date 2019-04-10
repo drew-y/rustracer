@@ -1,8 +1,10 @@
 use std::cmp::Ordering;
 use rand::prelude::*;
-use super::hitable::{ Hitable, HitRecord };
-use super::ray::Ray;
-use super::aabb::AABB;
+use super::super::{
+    hitable::{ Hitable, HitRecord },
+    ray::Ray,
+    aabb::AABB
+};
 
 pub struct BVHNode {
     pub left: Option<Box<Hitable>>,

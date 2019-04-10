@@ -1,23 +1,21 @@
 mod vec3;
 mod ray;
 mod hitable;
-mod sphere;
+mod geometry;
 mod camera;
 mod material;
 mod utils;
-mod bvh;
 mod aabb;
 mod texture;
 mod scene;
 mod render;
-mod rect;
 
 use vec3::{ Vec3 };
 use hitable::{ Hitable };
 use std::thread;
 use std::sync::Arc;
 use camera::{ Camera, CameraOpts };
-use bvh::BVHNode;
+use geometry::bvh::BVHNode;
 use std::io;
 use std::io::BufWriter;
 use png::HasParameters;

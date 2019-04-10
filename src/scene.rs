@@ -1,10 +1,12 @@
 use super::hitable::Hitable;
 use rand::prelude::*;
 use super::vec3::Vec3;
-use super::sphere::Sphere;
-use super::rect::{ XYRect };
 use super::material::Material::{ Lambertion, Metal, Dielectric, DiffuseLight };
 use super::texture::{ CheckerTexture, ConstantTexture };
+use super::geometry::{
+    sphere::Sphere,
+    rect::{ XYRect },
+};
 
 pub fn random_scene() -> Vec<Box<Hitable>> {
     let mut rng = thread_rng();

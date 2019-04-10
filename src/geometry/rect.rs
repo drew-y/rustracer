@@ -1,8 +1,10 @@
-use super::material::Material;
-use super::hitable::{ Hitable, HitRecord };
-use super::aabb::AABB;
-use super::vec3::Vec3;
-use super::ray::Ray;
+use super::super::{
+    material::Material,
+    hitable::{ Hitable, HitRecord },
+    aabb::AABB,
+    vec3::Vec3,
+    ray::Ray,
+};
 
 pub struct XYRect {
     pub x0: f32,

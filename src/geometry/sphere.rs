@@ -1,9 +1,11 @@
-use super::hitable::{ Hitable, HitRecord };
-use super::vec3::{ Vec3, dot, };
-use super::ray::Ray;
-use super::material::Material;
-use super::aabb::AABB;
 use std::ops::Deref;
+use super::super::{
+    hitable::{ Hitable, HitRecord },
+    vec3::{ Vec3, dot, },
+    ray::Ray,
+    material::Material,
+    aabb::AABB
+};
 
 pub struct Sphere {
     pub center: Vec3,
