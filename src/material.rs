@@ -8,7 +8,8 @@ use super::texture::Texture;
 pub enum Material {
     Lambertion { albedo: Box<Texture> },
     Metal { albedo: Vec3, fuzz: f32 },
-    Dielectric { ref_idx: f32 }
+    Dielectric { ref_idx: f32 },
+    DiffuseLight { emit: Box<Texture> }
 }
 
 impl Material {
@@ -81,7 +82,15 @@ impl Material {
             Material::Metal { albedo, fuzz } =>
                 Material::metal_scatter(r, rec, albedo, *fuzz),
             Material::Dielectric { ref_idx } =>
-                Material::dielectric_scatter(r, rec, *ref_idx)
+                Material::dielectric_scatter(r, rec, *ref_idx),
+            Material::DiffuseLight { .. } => None
+        }
+    }
+
+    pub fn emitted(&self, u: f32, v: f32, p: Vec3) -> Vec3 {
+        match self {
+            Material::DiffuseLight { emit } => emit.value(u, v, p),
+            _ => Vec3::new(0.0, 0.0, 0.0)
         }
     }
 }

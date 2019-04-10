@@ -1,4 +1,4 @@
-use super::vec3::{ Vec3, unit_vector };
+use super::vec3::{ Vec3 };
 use super::hitable::{ Hitable };
 use super::ray::Ray;
 use std::f32::MAX;
@@ -8,16 +8,16 @@ use rand::prelude::*;
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
-        if depth >= 50 { return Vec3::new(0.0, 0.0, 0.0); }
+        let emitted = rec.material.emitted(0.0, 0.0, rec.p);
+        if depth >= 50 { return emitted; }
         if let Some((attenuation, scattered)) = rec.material.scatter(r, &rec) {
-            return attenuation * color(&scattered, world, depth + 1);
+            emitted + attenuation * color(&scattered, world, depth + 1)
+        } else {
+            emitted
         }
-        return Vec3::new(0.0, 0.0, 0.0);
+    } else {
+        Vec3::new(0.0, 0.0, 0.0)
     }
-
-    let unit_direction = unit_vector(&r.direction);
-    let t = 0.5 * (unit_direction.y + 1.0);
-    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }
 
 pub struct Scene<'a> {

@@ -26,7 +26,7 @@ use render::{ Scene, render };
 fn main() {
     let nx: i32 = 1200;
     let ny: i32 = 800;
-    let ns: i32 = 10;
+    let ns: i32 = 20;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
     let world = Arc::new(BVHNode::new(random_scene()));

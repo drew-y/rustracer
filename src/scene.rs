@@ -2,7 +2,7 @@ use super::hitable::Hitable;
 use rand::prelude::*;
 use super::vec3::Vec3;
 use super::sphere::Sphere;
-use super::material::Material::{ Lambertion, Metal, Dielectric };
+use super::material::Material::{ Lambertion, Metal, Dielectric, DiffuseLight };
 use super::texture::{ CheckerTexture, ConstantTexture };
 
 pub fn random_scene() -> Vec<Box<Hitable>> {
@@ -17,6 +17,18 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
             let choose_mat = rnd();
             let center = Vec3::new(fl(a) + 0.9 * rnd(), 0.2, fl(b) + 0.9 * rnd());
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                // Diffuse Light
+                if choose_mat < 0.3 {
+                    list.push(Box::new(Sphere {
+                        center,
+                        radius: 0.2,
+                        material: DiffuseLight {
+                            emit: Box::new(ConstantTexture::new(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()))
+                        }
+                    }));
+                    continue;
+                };
+
                 // Diffuse
                 if choose_mat < 0.8 {
                     list.push(Box::new(Sphere {
@@ -80,6 +92,14 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
         material: Metal {
             albedo: Vec3::new(0.7, 0.6, 0.5),
             fuzz: 0.0
+        }
+    }));
+
+    // Light
+    list.push(Box::new(Sphere {
+        center: Vec3::new(2.0, 2.0, 2.0), radius: 0.5,
+        material: DiffuseLight {
+            emit: Box::new(ConstantTexture::new(1.0, 1.0, 1.0))
         }
     }));
 
