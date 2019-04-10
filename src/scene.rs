@@ -2,6 +2,7 @@ use super::hitable::Hitable;
 use rand::prelude::*;
 use super::vec3::Vec3;
 use super::sphere::Sphere;
+use super::rect::{ XYRect };
 use super::material::Material::{ Lambertion, Metal, Dielectric, DiffuseLight };
 use super::texture::{ CheckerTexture, ConstantTexture };
 
@@ -96,6 +97,45 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
         material: Metal {
             albedo: Vec3::new(0.7, 0.6, 0.5),
             fuzz: 0.0
+        }
+    }));
+
+    list
+}
+
+pub fn simple_light() -> Vec<Box<Hitable>> {
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(4);
+
+    let floor_texture = Box::new(CheckerTexture {
+        odd: Box::new(ConstantTexture::new(0.2, 0.3, 0.1)),
+        even: Box::new(ConstantTexture::new(0.9, 0.9, 0.9)),
+    });
+
+    // Floor
+    list.push(Box::new(Sphere {
+        center: Vec3::new(0.0, -1000.0, 0.0),
+        radius: 1000.0,
+        material: Lambertion { albedo: floor_texture }
+    }));
+
+    list.push(Box::new(Sphere {
+        center: Vec3::new(0.0, 2.0, 0.0), radius: 2.0,
+        material: Lambertion {
+            albedo: Box::new(ConstantTexture::new(0.4, 0.2, 0.1))
+        }
+    }));
+
+    list.push(Box::new(Sphere {
+        center: Vec3::new(0.0, 7.0, 0.0), radius: 2.0,
+        material: DiffuseLight {
+            emit: Box::new(ConstantTexture::new(4.0, 4.0, 4.0))
+        }
+    }));
+
+    list.push(Box::new(XYRect {
+        x0: 3.0, x1: 5.0, y0: 1.0, y1: 3.0, k: -2.0,
+        material: DiffuseLight {
+            emit: Box::new(ConstantTexture::new(4.0, 4.0, 4.0))
         }
     }));
 

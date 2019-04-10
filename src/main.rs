@@ -10,6 +10,7 @@ mod aabb;
 mod texture;
 mod scene;
 mod render;
+mod rect;
 
 use vec3::{ Vec3 };
 use hitable::{ Hitable };
@@ -20,23 +21,23 @@ use bvh::BVHNode;
 use std::io;
 use std::io::BufWriter;
 use png::HasParameters;
-use scene::random_scene;
+use scene::{ random_scene, simple_light };
 use render::{ Scene, render };
 
 fn main() {
-    let nx: i32 = 1200;
-    let ny: i32 = 800;
-    let ns: i32 = 20;
+    let nx: i32 = 1920;
+    let ny: i32 = 1080;
+    let ns: i32 = 50;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let world = Arc::new(BVHNode::new(random_scene()));
+    let world = Arc::new(BVHNode::new(simple_light()));
 
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(13.0, 2.0, 3.0),
-        lookat: Vec3::new(0.0, 0.0, 0.0),
+        lookat: Vec3::new(0.0, 2.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
-        focus_dist: 10.0, aperture: 0.1, vfow: 20.0
+        focus_dist: 13.0, aperture: 2.0, vfow: 40.0
     });
 
     let thread_count = 8;
