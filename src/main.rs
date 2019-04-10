@@ -19,7 +19,7 @@ use geometry::bvh::BVHNode;
 use std::io;
 use std::io::BufWriter;
 use png::HasParameters;
-use scene::{ random_scene, simple_light };
+use scene::{ random_scene, simple_light, cornell_box };
 use render::{ Scene, render };
 
 fn main() {
@@ -28,14 +28,14 @@ fn main() {
     let ns: i32 = 50;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let world = Arc::new(BVHNode::new(simple_light()));
+    let world = Arc::new(BVHNode::new(cornell_box()));
 
     let cam = Camera::new(CameraOpts {
-        lookfrom: Vec3::new(13.0, 2.0, 3.0),
-        lookat: Vec3::new(0.0, 2.0, 0.0),
+        lookfrom: Vec3::new(278.0, 278.0, -800.0),
+        lookat: Vec3::new(278.0, 278.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
-        focus_dist: 13.0, aperture: 0.00001, vfow: 40.0
+        focus_dist: 10.0, aperture: 0.0, vfow: 40.0
     });
 
     let thread_count = 8;

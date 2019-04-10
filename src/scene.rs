@@ -1,13 +1,19 @@
-use super::hitable::Hitable;
 use rand::prelude::*;
-use super::vec3::Vec3;
-use super::material::Material::{ Lambertion, Metal, Dielectric, DiffuseLight };
-use super::texture::{ CheckerTexture, ConstantTexture };
-use super::geometry::{
-    sphere::Sphere,
-    rect::{ XYRect },
+use super::{
+    hitable::Hitable,
+    vec3::Vec3,
+    material::{
+        self, Material::{ Lambertion, Metal, Dielectric, DiffuseLight },
+    },
+    texture::{ CheckerTexture, ConstantTexture },
+    geometry::{
+        sphere::Sphere,
+        rect::{ XYRect, YZRect, XZRect },
+        translation
+    }
 };
 
+#[allow(dead_code)]
 pub fn random_scene() -> Vec<Box<Hitable>> {
     let mut rng = thread_rng();
     let mut rnd = || rng.gen::<f32>();
@@ -84,27 +90,23 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
     // Big sphere trio
     list.push(Box::new(Sphere {
         center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0,
-        material: Dielectric { ref_idx: 1.5 }
+        material: material::dielectric(1.5)
     }));
 
     list.push(Box::new(Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0,
-        material: Lambertion {
-            albedo: Box::new(ConstantTexture::new(0.4, 0.2, 0.1))
-        }
+        material: material::lambertion(0.4, 0.2, 0.1)
     }));
 
     list.push(Box::new(Sphere {
         center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0,
-        material: Metal {
-            albedo: Vec3::new(0.7, 0.6, 0.5),
-            fuzz: 0.0
-        }
+        material: material::metal(Vec3::new(0.7, 0.6, 0.5), 0.0)
     }));
 
     list
 }
 
+#[allow(dead_code)]
 pub fn simple_light() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(4);
 
@@ -122,24 +124,55 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
 
     list.push(Box::new(Sphere {
         center: Vec3::new(0.0, 2.0, 0.0), radius: 2.0,
-        material: Lambertion {
-            albedo: Box::new(ConstantTexture::new(0.4, 0.2, 0.1))
-        }
+        material: material::lambertion(0.4, 0.2, 0.1)
     }));
 
     list.push(Box::new(Sphere {
         center: Vec3::new(0.0, 7.0, 0.0), radius: 2.0,
-        material: DiffuseLight {
-            emit: Box::new(ConstantTexture::new(4.0, 4.0, 4.0))
-        }
+        material: material::diffuse_light(4.0, 4.0, 4.0)
     }));
 
     list.push(Box::new(XYRect {
         x0: 3.0, x1: 5.0, y0: 1.0, y1: 3.0, k: -2.0,
-        material: DiffuseLight {
-            emit: Box::new(ConstantTexture::new(4.0, 4.0, 4.0))
-        }
+        material: material::diffuse_light(4.0, 4.0, 4.0)
     }));
+
+    list
+}
+
+#[allow(dead_code)]
+pub fn cornell_box() -> Vec<Box<Hitable>> {
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(6);
+
+    list.push(translation::flip_normals(Box::new(YZRect {
+        y0: 0.0, y1: 555.0, z0: 0.0, z1: 555.0, k: 555.0,
+        material: material::lambertion(0.12, 0.45, 0.15)
+    })));
+
+    list.push(Box::new(YZRect {
+        y0: 0.0, y1: 555.0, z0: 0.0, z1: 555.0, k: 0.0,
+        material: material::lambertion(0.65, 0.05, 0.05)
+    }));
+
+    list.push(Box::new(XZRect {
+        x0: 213.0, x1: 343.0, z0: 227.0, z1: 332.0, k: 554.0,
+        material: material::diffuse_light(15.0, 15.0, 15.0)
+    }));
+
+    list.push(translation::flip_normals(Box::new(XZRect {
+        x0: 0.0, x1: 555.0, z0: 0.0, z1: 555.0, k: 555.0,
+        material: material::lambertion(0.73, 0.73, 0.73)
+    })));
+
+    list.push(Box::new(XZRect {
+        x0: 0.0, x1: 555.0, z0: 0.0, z1: 555.0, k: 0.0,
+        material: material::lambertion(0.73, 0.73, 0.73)
+    }));
+
+    list.push(translation::flip_normals(Box::new(XYRect {
+        x0: 0.0, x1: 555.0, y0: 0.0, y1: 555.0, k: 555.0,
+        material: material::lambertion(0.73, 0.73, 0.73)
+    })));
 
     list
 }

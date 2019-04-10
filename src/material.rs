@@ -3,7 +3,7 @@ use super::hitable::HitRecord;
 use super::ray::Ray;
 use super::utils::random_in_unit_sphere;
 use rand::prelude::*;
-use super::texture::Texture;
+use super::texture::{ Texture, ConstantTexture };
 
 pub enum Material {
     Lambertion { albedo: Box<Texture> },
@@ -92,5 +92,31 @@ impl Material {
             Material::DiffuseLight { emit } => emit.value(u, v, p),
             _ => Vec3::new(0.0, 0.0, 0.0)
         }
+    }
+}
+
+/// Create a basic lambertion material
+pub fn lambertion(r: f32, g: f32, b: f32) -> Material {
+    Material::Lambertion {
+        albedo: Box::new(ConstantTexture::new(r, g, b))
+    }
+}
+
+/// Create a basic metal material
+pub fn metal(color: Vec3, fuzz: f32) -> Material {
+    Material::Metal {
+        albedo: color,
+        fuzz
+    }
+}
+/// Create a basic dielectric material
+pub fn dielectric(ref_idx: f32) -> Material {
+    Material::Dielectric { ref_idx }
+}
+
+/// Create a basic diffuse light material
+pub fn diffuse_light(r: f32, g: f32, b: f32) -> Material {
+    Material::DiffuseLight {
+        emit: Box::new(ConstantTexture::new(r, g, b))
     }
 }
