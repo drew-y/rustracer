@@ -1,9 +1,9 @@
-use super::vec3::Vec3;
-use super::ray::Ray;
-use super::material::Material;
 use super::aabb::AABB;
-use std::sync::Arc;
+use super::material::Material;
+use super::ray::Ray;
+use super::vec3::Vec3;
 use std::ops::Deref;
+use std::sync::Arc;
 
 pub trait Hitable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
@@ -16,7 +16,7 @@ pub struct HitRecord<'a> {
     pub t: f32,
     pub p: Vec3,
     pub normal: Vec3,
-    pub material: &'a Material
+    pub material: &'a Material,
 }
 
 impl Hitable for Arc<Hitable> {

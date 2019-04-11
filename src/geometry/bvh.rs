@@ -1,15 +1,15 @@
-use std::cmp::Ordering;
-use rand::prelude::*;
 use super::super::{
-    hitable::{ Hitable, HitRecord },
+    aabb::AABB,
+    hitable::{HitRecord, Hitable},
     ray::Ray,
-    aabb::AABB
 };
+use rand::prelude::*;
+use std::cmp::Ordering;
 
 pub struct BVHNode {
     pub left: Option<Box<Hitable>>,
     pub right: Option<Box<Hitable>>,
-    pub bbox: Option<AABB>
+    pub bbox: Option<AABB>,
 }
 
 impl BVHNode {
@@ -22,7 +22,7 @@ impl BVHNode {
             0 => list.sort_by(|a, b| Self::box_x_compare(&a, &b)),
             1 => list.sort_by(|a, b| Self::box_y_compare(&a, &b)),
             2 => list.sort_by(|a, b| Self::box_z_compare(&a, &b)),
-            _ => panic!("Invalid axis")
+            _ => panic!("Invalid axis"),
         };
 
         if list.len() == 1 {
@@ -31,8 +31,8 @@ impl BVHNode {
             return BVHNode {
                 left: Some(left),
                 right: None,
-                bbox
-            }
+                bbox,
+            };
         };
 
         if list.len() == 2 {
@@ -46,7 +46,11 @@ impl BVHNode {
                 bbox = Some(AABB::surrounding_box(&hit_left, &hit_right));
             };
 
-            return BVHNode { left: Some(left), right: Some(right), bbox }
+            return BVHNode {
+                left: Some(left),
+                right: Some(right),
+                bbox,
+            };
         };
 
         let left_list = list.split_off(list.len() / 2);
@@ -63,7 +67,7 @@ impl BVHNode {
         BVHNode {
             left: Some(Box::new(left)),
             right: Some(Box::new(right)),
-            bbox
+            bbox,
         }
     }
 
@@ -106,18 +110,20 @@ impl BVHNode {
 
 impl Hitable for BVHNode {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
-        if self.bbox.is_none() { return None };
+        if self.bbox.is_none() {
+            return None;
+        };
         if let Some((new_t_min, new_t_max)) = self.bbox.unwrap().hit(r, t_min, t_max) {
             let hit_left = if let Some(left) = &self.left {
-              left.hit(r, new_t_min, new_t_max)
+                left.hit(r, new_t_min, new_t_max)
             } else {
-              None
+                None
             };
 
             let hit_right = if let Some(right) = &self.right {
-              right.hit(r, new_t_min, new_t_max)
+                right.hit(r, new_t_min, new_t_max)
             } else {
-              None
+                None
             };
 
             if let (Some(left_rec), Some(right_rec)) = (hit_left, hit_right) {
@@ -131,7 +137,9 @@ impl Hitable for BVHNode {
             } else {
                 hit_right
             }
-        } else { None }
+        } else {
+            None
+        }
     }
 
     fn bounding_box(&self) -> Option<AABB> {

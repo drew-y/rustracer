@@ -1,10 +1,10 @@
-use std::{ ops, fmt };
+use std::{fmt, ops};
 
 #[derive(Clone, Copy, Debug)]
 pub struct Vec3 {
     pub x: f32,
     pub y: f32,
-    pub z: f32
+    pub z: f32,
 }
 
 impl Vec3 {
@@ -33,7 +33,7 @@ impl Vec3 {
             0 => Some(self.x),
             1 => Some(self.y),
             2 => Some(self.z),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -46,7 +46,7 @@ pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
     Vec3 {
         x: v1.y * v2.z - v1.z * v2.y,
         y: -(v1.x * v2.z - v1.z * v2.x),
-        z: v1.x * v2.y - v1.y * v2.x
+        z: v1.x * v2.y - v1.y * v2.x,
     }
 }
 
@@ -72,7 +72,7 @@ impl ops::Add<Vec3> for Vec3 {
         Vec3 {
             x: self.x + _rhs.x,
             y: self.y + _rhs.y,
-            z: self.z + _rhs.z
+            z: self.z + _rhs.z,
         }
     }
 }
@@ -84,7 +84,7 @@ impl ops::Sub<Vec3> for Vec3 {
         Vec3 {
             x: self.x - _rhs.x,
             y: self.y - _rhs.y,
-            z: self.z - _rhs.z
+            z: self.z - _rhs.z,
         }
     }
 }
@@ -96,7 +96,7 @@ impl ops::Sub<Vec3> for &Vec3 {
         Vec3 {
             x: self.x - _rhs.x,
             y: self.y - _rhs.y,
-            z: self.z - _rhs.z
+            z: self.z - _rhs.z,
         }
     }
 }
@@ -108,7 +108,7 @@ impl ops::Neg for Vec3 {
         Vec3 {
             x: self.x * -1.0,
             y: self.y * -1.0,
-            z: self.z * -1.0
+            z: self.z * -1.0,
         }
     }
 }
@@ -120,7 +120,7 @@ impl ops::Mul<Vec3> for Vec3 {
         Vec3 {
             x: self.x * _rhs.x,
             y: self.y * _rhs.y,
-            z: self.z * _rhs.z
+            z: self.z * _rhs.z,
         }
     }
 }
@@ -132,7 +132,7 @@ impl ops::Mul<f32> for Vec3 {
         Vec3 {
             x: self.x * _rhs,
             y: self.y * _rhs,
-            z: self.z * _rhs
+            z: self.z * _rhs,
         }
     }
 }
@@ -144,7 +144,7 @@ impl ops::Mul<f32> for &Vec3 {
         Vec3 {
             x: self.x * _rhs,
             y: self.y * _rhs,
-            z: self.z * _rhs
+            z: self.z * _rhs,
         }
     }
 }
@@ -156,7 +156,7 @@ impl ops::Mul<Vec3> for f32 {
         Vec3 {
             x: self * _rhs.x,
             y: self * _rhs.y,
-            z: self * _rhs.z
+            z: self * _rhs.z,
         }
     }
 }
@@ -168,7 +168,7 @@ impl ops::Mul<&Vec3> for f32 {
         Vec3 {
             x: self * _rhs.x,
             y: self * _rhs.y,
-            z: self * _rhs.z
+            z: self * _rhs.z,
         }
     }
 }
@@ -180,7 +180,7 @@ impl ops::Div<Vec3> for Vec3 {
         Vec3 {
             x: self.x / _rhs.x,
             y: self.y / _rhs.y,
-            z: self.z / _rhs.z
+            z: self.z / _rhs.z,
         }
     }
 }
@@ -192,7 +192,7 @@ impl ops::Div<f32> for Vec3 {
         Vec3 {
             x: self.x / _rhs,
             y: self.y / _rhs,
-            z: self.z / _rhs
+            z: self.z / _rhs,
         }
     }
 }
@@ -204,7 +204,7 @@ impl ops::Div<f32> for &Vec3 {
         Vec3 {
             x: self.x / _rhs,
             y: self.y / _rhs,
-            z: self.z / _rhs
+            z: self.z / _rhs,
         }
     }
 }

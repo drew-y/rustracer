@@ -1,19 +1,18 @@
 use super::super::{
-    vec3::Vec3,
-    hitable::{ Hitable, HitRecord },
-    material::Material,
     aabb::AABB,
-    ray::Ray
+    hitable::{HitRecord, Hitable},
+    material::Material,
+    ray::Ray,
+    vec3::Vec3,
 };
 use super::{
     bvh::BVHNode,
+    rect::{XYRect, XZRect, YZRect},
     translation,
-    rect::{ XYRect, YZRect, XZRect },
 };
 
-
 pub struct BoxGeo {
-    rects: BVHNode
+    rects: BVHNode,
 }
 
 impl BoxGeo {
@@ -21,36 +20,62 @@ impl BoxGeo {
         let mut list: Vec<Box<Hitable>> = Vec::with_capacity(6);
 
         list.push(Box::new(XYRect {
-            x0: pmin.x, x1: pmax.x, y0: pmin.y, y1: pmax.y, k: pmax.z,
-            material: material.clone()
+            x0: pmin.x,
+            x1: pmax.x,
+            y0: pmin.y,
+            y1: pmax.y,
+            k: pmax.z,
+            material: material.clone(),
         }));
 
         list.push(Box::new(translation::flip_normals(XYRect {
-            x0: pmin.x, x1: pmax.x, y0: pmin.y, y1: pmax.y, k: pmin.z,
-            material: material.clone()
+            x0: pmin.x,
+            x1: pmax.x,
+            y0: pmin.y,
+            y1: pmax.y,
+            k: pmin.z,
+            material: material.clone(),
         })));
 
         list.push(Box::new(XZRect {
-            x0: pmin.x, x1: pmax.x, z0: pmin.z, z1: pmax.z, k: pmax.y,
-            material: material.clone()
+            x0: pmin.x,
+            x1: pmax.x,
+            z0: pmin.z,
+            z1: pmax.z,
+            k: pmax.y,
+            material: material.clone(),
         }));
 
         list.push(Box::new(translation::flip_normals(XZRect {
-            x0: pmin.x, x1: pmax.x, z0: pmin.z, z1: pmax.z, k: pmin.y,
-            material: material.clone()
+            x0: pmin.x,
+            x1: pmax.x,
+            z0: pmin.z,
+            z1: pmax.z,
+            k: pmin.y,
+            material: material.clone(),
         })));
 
         list.push(Box::new(YZRect {
-            y0: pmin.y, y1: pmax.y, z0: pmin.z, z1: pmax.z, k: pmax.x,
-            material: material.clone()
+            y0: pmin.y,
+            y1: pmax.y,
+            z0: pmin.z,
+            z1: pmax.z,
+            k: pmax.x,
+            material: material.clone(),
         }));
 
         list.push(Box::new(translation::flip_normals(YZRect {
-            y0: pmin.y, y1: pmax.y, z0: pmin.z, z1: pmax.z, k: pmin.x,
-            material: material.clone()
+            y0: pmin.y,
+            y1: pmax.y,
+            z0: pmin.z,
+            z1: pmax.z,
+            k: pmin.x,
+            material: material.clone(),
         })));
 
-        BoxGeo { rects: BVHNode::new(list) }
+        BoxGeo {
+            rects: BVHNode::new(list),
+        }
     }
 }
 

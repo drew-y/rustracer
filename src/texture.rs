@@ -35,13 +35,13 @@ impl<T: Texture> Texture for Arc<T> {
 
 #[derive(Copy, Clone)]
 pub struct ConstantTexture {
-    pub color: Vec3
+    pub color: Vec3,
 }
 
 impl ConstantTexture {
     pub fn new(r: f32, g: f32, b: f32) -> Self {
         ConstantTexture {
-            color: Vec3::new(r, g, b)
+            color: Vec3::new(r, g, b),
         }
     }
 }
@@ -59,7 +59,7 @@ impl Texture for ConstantTexture {
 #[derive(Clone)]
 pub struct CheckerTexture {
     pub odd: Box<Texture>,
-    pub even: Box<Texture>
+    pub even: Box<Texture>,
 }
 
 impl Texture for CheckerTexture {

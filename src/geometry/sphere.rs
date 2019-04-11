@@ -1,16 +1,16 @@
-use std::ops::Deref;
 use super::super::{
-    hitable::{ Hitable, HitRecord },
-    vec3::{ Vec3, dot, },
-    ray::Ray,
+    aabb::AABB,
+    hitable::{HitRecord, Hitable},
     material::Material,
-    aabb::AABB
+    ray::Ray,
+    vec3::{dot, Vec3},
 };
+use std::ops::Deref;
 
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,
-    pub material: Material
+    pub material: Material,
 }
 
 impl Hitable for Sphere {
@@ -25,15 +25,21 @@ impl Hitable for Sphere {
             let gen_hit_record = |t: f32| {
                 let p = r.point_at_parameter(t);
                 Some(HitRecord {
-                    t, p, material: &self.material,
-                    normal: (p - self.center) / self.radius
+                    t,
+                    p,
+                    material: &self.material,
+                    normal: (p - self.center) / self.radius,
                 })
             };
 
             let mut t = (-b - (b * b - a * c).sqrt()) / a;
-            if test(t) { return gen_hit_record(t); };
+            if test(t) {
+                return gen_hit_record(t);
+            };
             t = (-b + (b * b - a * c).sqrt()) / a;
-            if test(t) { return gen_hit_record(t); };
+            if test(t) {
+                return gen_hit_record(t);
+            };
         };
         None
     }
@@ -41,7 +47,7 @@ impl Hitable for Sphere {
     fn bounding_box(&self) -> Option<AABB> {
         Some(AABB {
             min: self.center - Vec3::new(self.radius, self.radius, self.radius),
-            max: self.center + Vec3::new(self.radius, self.radius, self.radius)
+            max: self.center + Vec3::new(self.radius, self.radius, self.radius),
         })
     }
 }

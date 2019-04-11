@@ -1,31 +1,31 @@
-mod vec3;
-mod ray;
-mod hitable;
-mod geometry;
-mod camera;
-mod material;
-mod utils;
 mod aabb;
-mod texture;
-mod scene;
+mod camera;
+mod geometry;
+mod hitable;
+mod material;
+mod ray;
 mod render;
+mod scene;
+mod texture;
+mod utils;
+mod vec3;
 
-use vec3::{ Vec3 };
-use hitable::{ Hitable };
-use std::thread;
-use std::sync::Arc;
-use camera::{ Camera, CameraOpts };
+use camera::{Camera, CameraOpts};
 use geometry::bvh::BVHNode;
+use hitable::Hitable;
+use png::HasParameters;
+use render::{render, Scene};
+use scene::cornell_box;
 use std::io;
 use std::io::BufWriter;
-use png::HasParameters;
-use scene::{ cornell_box };
-use render::{ Scene, render };
+use std::sync::Arc;
+use std::thread;
+use vec3::Vec3;
 
 fn main() {
     let nx: i32 = 1920;
     let ny: i32 = 1080;
-    let ns: i32 = 100;
+    let ns: i32 = 1000;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
     let world = Arc::new(BVHNode::new(cornell_box()));
@@ -35,7 +35,9 @@ fn main() {
         lookat: Vec3::new(278.0, 278.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
-        focus_dist: 10.0, aperture: 0.0, vfow: 40.0
+        focus_dist: 10.0,
+        aperture: 0.0,
+        vfow: 40.0,
     });
 
     let thread_count = 8;
@@ -46,11 +48,17 @@ fn main() {
     let mut endy = ny;
     for _render_thread_num in 0..thread_count {
         let thread_world = world.clone();
-        let render_thread = thread::spawn(move || render::<Arc<Hitable>>(Scene {
-            nx, ny, ns, starty, endy,
-            cam: &cam,
-            hitable: thread_world
-        }));
+        let render_thread = thread::spawn(move || {
+            render::<Arc<Hitable>>(Scene {
+                nx,
+                ny,
+                ns,
+                starty,
+                endy,
+                cam: &cam,
+                hitable: thread_world,
+            })
+        });
         render_threads.push(render_thread);
         endy = starty;
         starty -= y_section_size;

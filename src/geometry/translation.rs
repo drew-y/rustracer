@@ -1,11 +1,11 @@
 use super::super::{
-    hitable::{ Hitable, HitRecord },
     aabb::AABB,
-    ray::Ray
+    hitable::{HitRecord, Hitable},
+    ray::Ray,
 };
 
 pub struct FlipNormals<T: Hitable> {
-    hitable: T
+    hitable: T,
 }
 
 impl<T: Hitable> Hitable for FlipNormals<T> {
@@ -15,7 +15,9 @@ impl<T: Hitable> Hitable for FlipNormals<T> {
                 normal: -rec.normal,
                 ..rec
             })
-        } else { None }
+        } else {
+            None
+        }
     }
 
     fn bounding_box(&self) -> Option<AABB> {
