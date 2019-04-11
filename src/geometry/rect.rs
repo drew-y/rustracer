@@ -5,6 +5,7 @@ use super::super::{
     ray::Ray,
     vec3::Vec3,
 };
+use super::translation::Translation;
 
 pub struct XYRect {
     pub x0: f32,
@@ -44,6 +45,8 @@ impl Hitable for XYRect {
     }
 }
 
+impl Translation for XYRect {}
+
 pub struct XZRect {
     pub x0: f32,
     pub x1: f32,
@@ -82,6 +85,8 @@ impl Hitable for XZRect {
     }
 }
 
+impl Translation for XZRect {}
+
 pub struct YZRect {
     pub y0: f32,
     pub y1: f32,
@@ -117,3 +122,5 @@ impl Hitable for YZRect {
         })
     }
 }
+
+impl Translation for YZRect {}

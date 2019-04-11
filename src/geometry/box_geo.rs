@@ -8,7 +8,7 @@ use super::super::{
 use super::{
     bvh::BVHNode,
     rect::{XYRect, XZRect, YZRect},
-    translation,
+    translation::Translation,
 };
 
 pub struct BoxGeo {
@@ -19,59 +19,68 @@ impl BoxGeo {
     pub fn new(pmin: Vec3, pmax: Vec3, material: Material) -> BoxGeo {
         let mut list: Vec<Box<Hitable>> = Vec::with_capacity(6);
 
-        list.push(Box::new(XYRect {
+        XYRect {
             x0: pmin.x,
             x1: pmax.x,
             y0: pmin.y,
             y1: pmax.y,
             k: pmax.z,
             material: material.clone(),
-        }));
+        }
+        .push_into_list_of_boxed_hitables(&mut list);
 
-        list.push(Box::new(translation::flip_normals(XYRect {
+        XYRect {
             x0: pmin.x,
             x1: pmax.x,
             y0: pmin.y,
             y1: pmax.y,
             k: pmin.z,
             material: material.clone(),
-        })));
+        }
+        .flip_normals()
+        .push_into_list_of_boxed_hitables(&mut list);
 
-        list.push(Box::new(XZRect {
+        XZRect {
             x0: pmin.x,
             x1: pmax.x,
             z0: pmin.z,
             z1: pmax.z,
             k: pmax.y,
             material: material.clone(),
-        }));
+        }
+        .push_into_list_of_boxed_hitables(&mut list);
 
-        list.push(Box::new(translation::flip_normals(XZRect {
+        XZRect {
             x0: pmin.x,
             x1: pmax.x,
             z0: pmin.z,
             z1: pmax.z,
             k: pmin.y,
             material: material.clone(),
-        })));
+        }
+        .flip_normals()
+        .push_into_list_of_boxed_hitables(&mut list);
 
-        list.push(Box::new(YZRect {
+        YZRect {
             y0: pmin.y,
             y1: pmax.y,
             z0: pmin.z,
             z1: pmax.z,
             k: pmax.x,
             material: material.clone(),
-        }));
+        }
+        .push_into_list_of_boxed_hitables(&mut list);
 
-        list.push(Box::new(translation::flip_normals(YZRect {
+        YZRect {
             y0: pmin.y,
             y1: pmax.y,
             z0: pmin.z,
             z1: pmax.z,
             k: pmin.x,
             material: material.clone(),
-        })));
+        }
+        .flip_normals()
+        .push_into_list_of_boxed_hitables(&mut list);
 
         BoxGeo {
             rects: BVHNode::new(list),
@@ -88,3 +97,5 @@ impl Hitable for BoxGeo {
         self.rects.bounding_box()
     }
 }
+
+impl Translation for BoxGeo {}

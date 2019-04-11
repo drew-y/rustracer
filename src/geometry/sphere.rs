@@ -5,6 +5,7 @@ use super::super::{
     ray::Ray,
     vec3::{dot, Vec3},
 };
+use super::translation::Translation;
 use std::ops::Deref;
 
 pub struct Sphere {
@@ -61,3 +62,5 @@ impl Hitable for Box<Sphere> {
         self.deref().bounding_box()
     }
 }
+
+impl Translation for Sphere {}

@@ -3,12 +3,12 @@ use super::{
         box_geo::BoxGeo,
         rect::{XYRect, XZRect, YZRect},
         sphere::Sphere,
-        translation,
+        translation::Translation,
     },
     hitable::Hitable,
     material::{
-        self,
-        Material::{Dielectric, DiffuseLight, Lambertion, Metal},
+        self, dielectric, diffuse_light, lambertion,
+        Material::{Lambertion, Metal},
     },
     texture::{CheckerTexture, ConstantTexture},
     vec3::Vec3,
@@ -30,39 +30,33 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 // Diffuse Light
                 if choose_mat < 0.6 {
-                    list.push(Box::new(Sphere {
+                    Sphere {
                         center,
                         radius: 0.2,
-                        material: DiffuseLight {
-                            emit: Box::new(ConstantTexture::new(
-                                rnd() * rnd(),
-                                rnd() * rnd(),
-                                rnd() * rnd(),
-                            )),
-                        },
-                    }));
+                        material: diffuse_light(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()),
+                    }
+                    .push_into_list_of_boxed_hitables(&mut list);
                     continue;
                 };
 
                 // Diffuse
                 if choose_mat < 0.8 {
-                    list.push(Box::new(Sphere {
+                    Sphere {
                         center,
                         radius: 0.2,
-                        material: Lambertion {
-                            albedo: Box::new(ConstantTexture::new(
-                                rnd() * rnd() * 4.0,
-                                rnd() * rnd() * 4.0,
-                                rnd() * rnd() * 4.0,
-                            )),
-                        },
-                    }));
+                        material: lambertion(
+                            rnd() * rnd() * 4.0,
+                            rnd() * rnd() * 4.0,
+                            rnd() * rnd() * 4.0,
+                        ),
+                    }
+                    .push_into_list_of_boxed_hitables(&mut list);
                     continue;
                 };
 
+                // Metal
                 if choose_mat < 0.95 {
-                    // Metal
-                    list.push(Box::new(Sphere {
+                    Sphere {
                         center,
                         radius: 0.2,
                         material: Metal {
@@ -73,16 +67,18 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
                             ),
                             fuzz: 0.5 * rnd(),
                         },
-                    }));
+                    }
+                    .push_into_list_of_boxed_hitables(&mut list);
                     continue;
                 };
 
                 // Glass
-                list.push(Box::new(Sphere {
+                Sphere {
                     center,
                     radius: 0.2,
-                    material: Dielectric { ref_idx: 1.5 },
-                }))
+                    material: dielectric(1.5),
+                }
+                .push_into_list_of_boxed_hitables(&mut list);
             };
         }
     }
@@ -93,32 +89,36 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
     });
 
     // Floor
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
         material: Lambertion {
             albedo: floor_texture,
         },
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
     // Big sphere trio
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(0.0, 1.0, 0.0),
         radius: 1.0,
         material: material::dielectric(1.5),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
         material: material::lambertion(0.4, 0.2, 0.1),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(4.0, 1.0, 0.0),
         radius: 1.0,
         material: material::metal(Vec3::new(0.7, 0.6, 0.5), 0.0),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
     list
 }
@@ -133,34 +133,38 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
     });
 
     // Floor
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
         material: Lambertion {
             albedo: floor_texture,
         },
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(0.0, 2.0, 0.0),
         radius: 2.0,
         material: material::lambertion(0.4, 0.2, 0.1),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(Sphere {
+    Sphere {
         center: Vec3::new(0.0, 7.0, 0.0),
         radius: 2.0,
         material: material::diffuse_light(4.0, 4.0, 4.0),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(XYRect {
+    XYRect {
         x0: 3.0,
         x1: 5.0,
         y0: 1.0,
         y1: 3.0,
         k: -2.0,
         material: material::diffuse_light(4.0, 4.0, 4.0),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
     list
 }
@@ -174,71 +178,82 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
     let light = material::diffuse_light(15.0, 15.0, 15.0);
     let white = material::lambertion(0.73, 0.73, 0.73);
 
-    list.push(Box::new(translation::flip_normals(YZRect {
+    YZRect {
         y0: 0.0,
         y1: 555.0,
         z0: 0.0,
         z1: 555.0,
         k: 555.0,
         material: green.clone(),
-    })));
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(YZRect {
+    YZRect {
         y0: 0.0,
         y1: 555.0,
         z0: 0.0,
         z1: 555.0,
         k: 0.0,
         material: red.clone(),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(XZRect {
+    XZRect {
         x0: 213.0,
         x1: 343.0,
         z0: 227.0,
         z1: 332.0,
         k: 554.0,
         material: light.clone(),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(translation::flip_normals(XZRect {
+    XZRect {
         x0: 0.0,
         x1: 555.0,
         z0: 0.0,
         z1: 555.0,
         k: 555.0,
         material: white.clone(),
-    })));
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(XZRect {
+    XZRect {
         x0: 0.0,
         x1: 555.0,
         z0: 0.0,
         z1: 555.0,
         k: 0.0,
         material: white.clone(),
-    }));
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(translation::flip_normals(XYRect {
+    XYRect {
         x0: 0.0,
         x1: 555.0,
         y0: 0.0,
         y1: 555.0,
         k: 555.0,
         material: white.clone(),
-    })));
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(BoxGeo::new(
+    BoxGeo::new(
         Vec3::new(130.0, 0.0, 65.0),
         Vec3::new(295.0, 165.0, 230.0),
         white.clone(),
-    )));
+    )
+    .push_into_list_of_boxed_hitables(&mut list);
 
-    list.push(Box::new(BoxGeo::new(
+    BoxGeo::new(
         Vec3::new(265.0, 0.0, 295.0),
         Vec3::new(430.0, 330.0, 460.0),
         white.clone(),
-    )));
+    )
+    .push_into_list_of_boxed_hitables(&mut list);
 
     list
 }

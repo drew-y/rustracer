@@ -25,6 +25,26 @@ impl<T: Hitable> Hitable for FlipNormals<T> {
     }
 }
 
+impl<T: Hitable> Translation for FlipNormals<T> {}
+
 pub fn flip_normals<T: Hitable>(hitable: T) -> FlipNormals<T> {
     FlipNormals { hitable: hitable }
+}
+
+pub trait Translation: Hitable + Sized {
+    fn flip_normals(self) -> FlipNormals<Self> {
+        flip_normals(self)
+    }
+
+    fn to_box(self) -> Box<Self> {
+        Box::new(self)
+    }
+
+    /// Push self into a list of boxed hitables (boxes self)
+    fn push_into_list_of_boxed_hitables<'a>(self, list: &mut Vec<Box<Hitable + 'a>>)
+    where
+        Self: 'a,
+    {
+        list.push(self.to_box())
+    }
 }
