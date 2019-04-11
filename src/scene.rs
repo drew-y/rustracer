@@ -9,7 +9,8 @@ use super::{
     geometry::{
         sphere::Sphere,
         rect::{ XYRect, YZRect, XZRect },
-        translation
+        translation,
+        box_geo::BoxGeo
     }
 };
 
@@ -142,37 +143,54 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
 
 #[allow(dead_code)]
 pub fn cornell_box() -> Vec<Box<Hitable>> {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(6);
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
 
-    list.push(translation::flip_normals(Box::new(YZRect {
+    let green = material::lambertion(0.12, 0.45, 0.15);
+    let red = material::lambertion(0.65, 0.05, 0.05);
+    let light = material::diffuse_light(15.0, 15.0, 15.0);
+    let white = material::lambertion(0.73, 0.73, 0.73);
+
+    list.push(Box::new(translation::flip_normals(YZRect {
         y0: 0.0, y1: 555.0, z0: 0.0, z1: 555.0, k: 555.0,
-        material: material::lambertion(0.12, 0.45, 0.15)
+        material: green.clone()
     })));
 
     list.push(Box::new(YZRect {
         y0: 0.0, y1: 555.0, z0: 0.0, z1: 555.0, k: 0.0,
-        material: material::lambertion(0.65, 0.05, 0.05)
+        material: red.clone()
     }));
 
     list.push(Box::new(XZRect {
         x0: 213.0, x1: 343.0, z0: 227.0, z1: 332.0, k: 554.0,
-        material: material::diffuse_light(15.0, 15.0, 15.0)
+        material: light.clone()
     }));
 
-    list.push(translation::flip_normals(Box::new(XZRect {
+    list.push(Box::new(translation::flip_normals(XZRect {
         x0: 0.0, x1: 555.0, z0: 0.0, z1: 555.0, k: 555.0,
-        material: material::lambertion(0.73, 0.73, 0.73)
+        material: white.clone()
     })));
 
     list.push(Box::new(XZRect {
         x0: 0.0, x1: 555.0, z0: 0.0, z1: 555.0, k: 0.0,
-        material: material::lambertion(0.73, 0.73, 0.73)
+        material: white.clone()
     }));
 
-    list.push(translation::flip_normals(Box::new(XYRect {
+    list.push(Box::new(translation::flip_normals(XYRect {
         x0: 0.0, x1: 555.0, y0: 0.0, y1: 555.0, k: 555.0,
-        material: material::lambertion(0.73, 0.73, 0.73)
+        material: white.clone()
     })));
+
+    list.push(Box::new(BoxGeo::new(
+        Vec3::new(130.0, 0.0, 65.0),
+        Vec3::new(295.0, 165.0, 230.0),
+        white.clone()
+    )));
+
+    list.push(Box::new(BoxGeo::new(
+        Vec3::new(265.0, 0.0, 295.0),
+        Vec3::new(430.0, 330.0, 460.0),
+        white.clone()
+    )));
 
     list
 }
