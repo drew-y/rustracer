@@ -5,6 +5,7 @@ use super::utils::random_in_unit_sphere;
 use rand::prelude::*;
 use super::texture::{ Texture, ConstantTexture };
 
+#[derive(Clone)]
 pub enum Material {
     Lambertion { albedo: Box<Texture> },
     Metal { albedo: Vec3, fuzz: f32 },
