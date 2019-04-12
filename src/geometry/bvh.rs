@@ -110,35 +110,31 @@ impl BVHNode {
 
 impl Hitable for BVHNode {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
-        if self.bbox.is_none() {
-            return None;
-        };
-        if let Some((new_t_min, new_t_max)) = self.bbox.unwrap().hit(r, t_min, t_max) {
-            let hit_left = if let Some(left) = &self.left {
-                left.hit(r, new_t_min, new_t_max)
-            } else {
-                None
-            };
+        let bbox = self.bbox?;
+        let (new_t_min, new_t_max) = bbox.hit(r, t_min, t_max)?;
 
-            let hit_right = if let Some(right) = &self.right {
-                right.hit(r, new_t_min, new_t_max)
-            } else {
-                None
-            };
-
-            if let (Some(left_rec), Some(right_rec)) = (hit_left, hit_right) {
-                if left_rec.t < right_rec.t {
-                    Some(left_rec)
-                } else {
-                    Some(right_rec)
-                }
-            } else if hit_left.is_some() {
-                hit_left
-            } else {
-                hit_right
-            }
+        let hit_left = if let Some(left) = &self.left {
+            left.hit(r, new_t_min, new_t_max)
         } else {
             None
+        };
+
+        let hit_right = if let Some(right) = &self.right {
+            right.hit(r, new_t_min, new_t_max)
+        } else {
+            None
+        };
+
+        if let (Some(left_rec), Some(right_rec)) = (hit_left, hit_right) {
+            if left_rec.t < right_rec.t {
+                Some(left_rec)
+            } else {
+                Some(right_rec)
+            }
+        } else if hit_left.is_some() {
+            hit_left
+        } else {
+            hit_right
         }
     }
 
