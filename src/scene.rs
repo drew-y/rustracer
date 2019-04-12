@@ -15,77 +15,95 @@ use super::{
 };
 use rand::prelude::*;
 
-#[allow(dead_code)]
-pub fn random_scene() -> Vec<Box<Hitable>> {
-    let mut rng = thread_rng();
-    let mut rnd = || rng.gen::<f32>();
-    let fl = |i: i32| i as f32;
-    let mut list: Vec<Box<Hitable>> = vec![];
-
-    // Generate random spheres
+fn gen_coords() -> [(i32, i32); 484] {
+    let mut coords: [(i32, i32); 484] = [(0, 0); 484];
+    let mut index = 0;
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = rnd();
-            let center = Vec3::new(fl(a) + 0.9 * rnd(), 0.2, fl(b) + 0.9 * rnd());
+            coords[index] = (a, b);
+            index += 1;
+        }
+    }
+    coords
+}
 
-            // Ensure we dont intersect with the main spheres
-            if (center - Vec3::new(4.0, 0.2, 0.0)).length() <= 0.9 {
-                continue;
-            };
+fn gen_random_spheres() -> Vec<Box<Hitable>> {
+    let mut rng = thread_rng();
+    let mut rnd = || rng.gen::<f32>();
+    let fl = |i: &i32| *i as f32;
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(484);
+    let coords = gen_coords();
 
-            // Diffuse Light
-            if choose_mat < 0.6 {
-                Sphere {
-                    center,
-                    radius: 0.2,
-                    material: diffuse_light(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()),
-                }
-                .push_into_list_of_boxed_hitables(&mut list);
-                continue;
-            };
+    // Generate random spheres
+    for (a, b) in coords.iter() {
+        let choose_mat = rnd();
+        let center = Vec3::new(fl(a) + 0.9 * rnd(), 0.2, fl(b) + 0.9 * rnd());
 
-            // Diffuse
-            if choose_mat < 0.8 {
-                Sphere {
-                    center,
-                    radius: 0.2,
-                    material: lambertion(
-                        rnd() * rnd() * 4.0,
-                        rnd() * rnd() * 4.0,
-                        rnd() * rnd() * 4.0,
-                    ),
-                }
-                .push_into_list_of_boxed_hitables(&mut list);
-                continue;
-            };
+        // Ensure we dont intersect with the main spheres
+        if (center - Vec3::new(4.0, 0.2, 0.0)).length() <= 0.9 {
+            continue;
+        };
 
-            // Metal
-            if choose_mat < 0.95 {
-                Sphere {
-                    center,
-                    radius: 0.2,
-                    material: Metal {
-                        albedo: Vec3::new(
-                            0.5 * (1.0 + rnd()),
-                            0.5 * (1.0 + rnd()),
-                            0.5 * (1.0 + rnd()),
-                        ),
-                        fuzz: 0.5 * rnd(),
-                    },
-                }
-                .push_into_list_of_boxed_hitables(&mut list);
-                continue;
-            };
-
-            // Glass
+        // Diffuse Light
+        if choose_mat < 0.6 {
             Sphere {
                 center,
                 radius: 0.2,
-                material: dielectric(1.5),
+                material: diffuse_light(rnd() * rnd(), rnd() * rnd(), rnd() * rnd()),
             }
             .push_into_list_of_boxed_hitables(&mut list);
+            continue;
+        };
+
+        // Diffuse
+        if choose_mat < 0.8 {
+            Sphere {
+                center,
+                radius: 0.2,
+                material: lambertion(
+                    rnd() * rnd() * 4.0,
+                    rnd() * rnd() * 4.0,
+                    rnd() * rnd() * 4.0,
+                ),
+            }
+            .push_into_list_of_boxed_hitables(&mut list);
+            continue;
+        };
+
+        // Metal
+        if choose_mat < 0.95 {
+            Sphere {
+                center,
+                radius: 0.2,
+                material: Metal {
+                    albedo: Vec3::new(
+                        0.5 * (1.0 + rnd()),
+                        0.5 * (1.0 + rnd()),
+                        0.5 * (1.0 + rnd()),
+                    ),
+                    fuzz: 0.5 * rnd(),
+                },
+            }
+            .push_into_list_of_boxed_hitables(&mut list);
+            continue;
+        };
+
+        // Glass
+        Sphere {
+            center,
+            radius: 0.2,
+            material: dielectric(1.5),
         }
+        .push_into_list_of_boxed_hitables(&mut list);
     }
+
+    list
+}
+
+#[allow(dead_code)]
+pub fn random_scene() -> Vec<Box<Hitable>> {
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(488);
+    list.extend(gen_random_spheres());
 
     let floor_texture = Box::new(CheckerTexture {
         odd: Box::new(ConstantTexture::new(0.2, 0.3, 0.1)),
