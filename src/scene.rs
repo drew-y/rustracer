@@ -264,17 +264,21 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
     .push_into_list_of_boxed_hitables(&mut list);
 
     BoxGeo::new(
-        Vec3::new(130.0, 0.0, 65.0),
-        Vec3::new(295.0, 165.0, 230.0),
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 165.0, 165.0),
         white.clone(),
     )
+    .rotate_y(-18.0)
+    .shift(130.0, 0.0, 65.0)
     .push_into_list_of_boxed_hitables(&mut list);
 
     BoxGeo::new(
-        Vec3::new(265.0, 0.0, 295.0),
-        Vec3::new(430.0, 330.0, 460.0),
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 330.0, 165.0),
         white.clone(),
     )
+    .rotate_y(15.0)
+    .shift(265.0, 0.0, 295.0)
     .push_into_list_of_boxed_hitables(&mut list);
 
     list

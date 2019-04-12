@@ -29,9 +29,9 @@ impl AABB {
         let mut new_tmin = tmin;
         let mut new_tmax = tmax;
         for i in 0..3 {
-            let inv_d = 1.0 / r.direction.index(i).unwrap();
-            let mut t0 = (self.min.index(i).unwrap() - r.origin.index(i).unwrap()) * inv_d;
-            let mut t1 = (self.max.index(i).unwrap() - r.origin.index(i).unwrap()) * inv_d;
+            let inv_d = 1.0 / r.direction.index(i);
+            let mut t0 = (self.min.index(i) - r.origin.index(i)) * inv_d;
+            let mut t1 = (self.max.index(i) - r.origin.index(i)) * inv_d;
             if inv_d < 0.0 {
                 std::mem::swap(&mut t0, &mut t1);
             }

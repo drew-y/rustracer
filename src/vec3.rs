@@ -28,12 +28,22 @@ impl Vec3 {
     }
 
     /// Field access by index 0: x, 1: y, 2: z
-    pub fn index(&self, i: i32) -> Option<f32> {
+    pub fn index(&self, i: i32) -> f32 {
         match i {
-            0 => Some(self.x),
-            1 => Some(self.y),
-            2 => Some(self.z),
-            _ => None,
+            0 => self.x,
+            1 => self.y,
+            2 => self.z,
+            _ => panic!("Invalid Vec3 index"),
+        }
+    }
+
+    /// Field access by index 0: x, 1: y, 2: z
+    pub fn set_index(&mut self, i: i32, val: f32) {
+        match i {
+            0 => self.x = val,
+            1 => self.y = val,
+            2 => self.z = val,
+            _ => panic!("Invalid Vec3 index"),
         }
     }
 }
