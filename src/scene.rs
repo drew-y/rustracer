@@ -268,7 +268,7 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
         Vec3::new(165.0, 165.0, 165.0),
         white.clone(),
     )
-    .rotate_y(-18.0)
+    // .rotate_y(-18.0)
     .shift(130.0, 0.0, 65.0)
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -277,8 +277,16 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
         Vec3::new(165.0, 330.0, 165.0),
         white.clone(),
     )
-    .rotate_y(15.0)
+    // .rotate_y(15.0)
     .shift(265.0, 0.0, 295.0)
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    // Big sphere trio
+    Sphere {
+        center: Vec3::new(350.0, 400.0, 295.0),
+        radius: 50.0,
+        material: material::dielectric(1.5),
+    }
     .push_into_list_of_boxed_hitables(&mut list);
 
     list

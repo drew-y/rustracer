@@ -128,7 +128,7 @@ impl<T: Hitable> Hitable for YRotation<T> {
         let mut origin = r.origin;
         let mut direction = r.direction;
         origin.x = self.cos_theta * r.origin.x - self.sin_theta * r.origin.z;
-        origin.z = self.sin_theta * r.origin.z + self.cos_theta * r.origin.z;
+        origin.z = self.sin_theta * r.origin.x + self.cos_theta * r.origin.z;
         direction.x = self.cos_theta * r.direction.x - self.sin_theta * r.direction.z;
         direction.z = self.sin_theta * r.direction.x + self.cos_theta * r.direction.z;
         let rotated_ray = Ray { origin, direction };
