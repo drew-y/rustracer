@@ -11,6 +11,7 @@ pub enum Material {
     Metal { albedo: Vec3, fuzz: f32 },
     Dielectric { ref_idx: f32 },
     DiffuseLight { emit: Box<Texture> },
+    Isotropic { albedo: Box<Texture> },
 }
 
 impl Material {
@@ -101,12 +102,23 @@ impl Material {
         ))
     }
 
+    fn isotropic_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
+        let scattered = Ray {
+            origin: rec.p,
+            direction: random_in_unit_sphere(),
+        };
+
+        let attenuation = albedo.value(0.0, 0.0, rec.p);
+        Some((attenuation, scattered))
+    }
+
     pub fn scatter(&self, r: &Ray, rec: &HitRecord) -> Option<(Vec3, Ray)> {
         match self {
             Material::Lambertion { albedo } => Material::lambertion_scatter(r, rec, albedo),
             Material::Metal { albedo, fuzz } => Material::metal_scatter(r, rec, albedo, *fuzz),
             Material::Dielectric { ref_idx } => Material::dielectric_scatter(r, rec, *ref_idx),
             Material::DiffuseLight { .. } => None,
+            Material::Isotropic { albedo } => Material::isotropic_scatter(r, rec, albedo),
         }
     }
 
@@ -141,5 +153,11 @@ pub fn dielectric(ref_idx: f32) -> Material {
 pub fn diffuse_light(r: f32, g: f32, b: f32) -> Material {
     Material::DiffuseLight {
         emit: Box::new(ConstantTexture::new(r, g, b)),
+    }
+}
+
+pub fn isotropic(r: f32, g: f32, b: f32) -> Material {
+    Material::Isotropic {
+        albedo: Box::new(ConstantTexture::new(r, g, b)),
     }
 }

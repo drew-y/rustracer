@@ -15,7 +15,7 @@ use geometry::bvh::BVHNode;
 use hitable::Hitable;
 use png::HasParameters;
 use render::{render, Scene};
-use scene::cornell_box;
+use scene::cornell_smoke;
 use std::io;
 use std::io::BufWriter;
 use std::sync::Arc;
@@ -23,12 +23,12 @@ use std::thread;
 use vec3::Vec3;
 
 fn main() {
-    let nx: i32 = 1000;
-    let ny: i32 = 1000;
-    let ns: i32 = 10000;
+    let nx: i32 = 800;
+    let ny: i32 = 800;
+    let ns: i32 = 500;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let world = Arc::new(BVHNode::new(cornell_box()));
+    let world = Arc::new(BVHNode::new(cornell_smoke()));
 
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(278.0, 278.0, -800.0),

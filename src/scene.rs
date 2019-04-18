@@ -1,13 +1,14 @@
 use super::{
     geometry::{
         box_geo::BoxGeo,
+        constant_medium::ConstantMedium,
         rect::{XYRect, XZRect, YZRect},
         sphere::Sphere,
         translation::Translation,
     },
     hitable::Hitable,
     material::{
-        self, dielectric, diffuse_light, lambertion,
+        self, dielectric, diffuse_light, isotropic, lambertion,
         Material::{Lambertion, Metal},
     },
     texture::{CheckerTexture, ConstantTexture},
@@ -268,7 +269,7 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
         Vec3::new(165.0, 165.0, 165.0),
         white.clone(),
     )
-    // .rotate_y(-18.0)
+    .rotate_y(-18.0)
     .shift(130.0, 0.0, 65.0)
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -277,8 +278,121 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
         Vec3::new(165.0, 330.0, 165.0),
         white.clone(),
     )
-    // .rotate_y(15.0)
+    .rotate_y(15.0)
     .shift(265.0, 0.0, 295.0)
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    // Big sphere trio
+    Sphere {
+        center: Vec3::new(350.0, 400.0, 295.0),
+        radius: 50.0,
+        material: material::dielectric(1.5),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    list
+}
+
+#[allow(dead_code)]
+pub fn cornell_smoke() -> Vec<Box<Hitable>> {
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
+
+    let green = material::lambertion(0.12, 0.45, 0.15);
+    let red = material::lambertion(0.65, 0.05, 0.05);
+    let light = material::diffuse_light(15.0, 15.0, 15.0);
+    let white = material::lambertion(0.73, 0.73, 0.73);
+
+    YZRect {
+        y0: 0.0,
+        y1: 555.0,
+        z0: 0.0,
+        z1: 555.0,
+        k: 555.0,
+        material: green.clone(),
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    YZRect {
+        y0: 0.0,
+        y1: 555.0,
+        z0: 0.0,
+        z1: 555.0,
+        k: 0.0,
+        material: red.clone(),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    XZRect {
+        x0: 213.0,
+        x1: 343.0,
+        z0: 227.0,
+        z1: 332.0,
+        k: 554.0,
+        material: light.clone(),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    XZRect {
+        x0: 0.0,
+        x1: 555.0,
+        z0: 0.0,
+        z1: 555.0,
+        k: 555.0,
+        material: white.clone(),
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    XZRect {
+        x0: 0.0,
+        x1: 555.0,
+        z0: 0.0,
+        z1: 555.0,
+        k: 0.0,
+        material: white.clone(),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    XYRect {
+        x0: 0.0,
+        x1: 555.0,
+        y0: 0.0,
+        y1: 555.0,
+        k: 555.0,
+        material: white.clone(),
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    let b1 = BoxGeo::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 165.0, 165.0),
+        white.clone(),
+    )
+    .rotate_y(-18.0)
+    .shift(130.0, 0.0, 65.0);
+
+    let b2 = BoxGeo::new(
+        Vec3::new(0.0, 0.0, 0.0),
+        Vec3::new(165.0, 330.0, 165.0),
+        white.clone(),
+    )
+    .rotate_y(15.0)
+    .shift(265.0, 0.0, 295.0);
+
+    ConstantMedium {
+        boundry: b1,
+        density: 0.01,
+        phase_function: isotropic(1.0, 1.0, 1.0),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    ConstantMedium {
+        boundry: b2,
+        density: 0.01,
+        phase_function: isotropic(0.0, 0.0, 0.0),
+    }
     .push_into_list_of_boxed_hitables(&mut list);
 
     // Big sphere trio
