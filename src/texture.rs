@@ -1,4 +1,4 @@
-use super::vec3::Vec3;
+use super::{perlin::Perlin, vec3::Vec3};
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -70,6 +70,27 @@ impl Texture for CheckerTexture {
         } else {
             self.even.value(u, v, p)
         }
+    }
+
+    fn box_clone(&self) -> Box<Texture> {
+        Box::new(self.deref().clone())
+    }
+}
+
+#[derive(Clone)]
+pub struct NoiseTexture {
+    noise: Perlin,
+}
+
+impl NoiseTexture {
+    pub fn new() -> NoiseTexture {
+        NoiseTexture { noise: Perlin::new( )}
+    }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _u: f32, _v: f32, p: Vec3) -> Vec3 {
+        Vec3::new(1.0, 1.0, 1.0) * self.noise.noise(p)
     }
 
     fn box_clone(&self) -> Box<Texture> {

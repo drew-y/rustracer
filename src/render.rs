@@ -1,10 +1,16 @@
 use super::camera::Camera;
 use super::hitable::Hitable;
 use super::ray::Ray;
-use super::vec3::Vec3;
+use super::vec3::{unit_vector, Vec3};
 use rand::prelude::*;
 use std::f32::MAX;
 use std::sync::Arc;
+
+fn sky_background(r: &Ray) -> Vec3 {
+    let unit_direction = unit_vector(&r.direction);
+    let t = 0.5 * (unit_direction.y + 1.0);
+    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
+}
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
@@ -18,7 +24,8 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
             emitted
         }
     } else {
-        Vec3::new(0.0, 0.0, 0.0)
+        // Vec3::new(0.0, 0.0, 0.0) // Black background
+        sky_background(r)
     }
 }
 

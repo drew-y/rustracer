@@ -11,7 +11,7 @@ use super::{
         self, dielectric, diffuse_light, isotropic, lambertion,
         Material::{Lambertion, Metal},
     },
-    texture::{CheckerTexture, ConstantTexture},
+    texture::{CheckerTexture, ConstantTexture, NoiseTexture, Texture},
     vec3::Vec3,
 };
 use rand::prelude::*;
@@ -101,7 +101,6 @@ fn gen_random_spheres() -> Vec<Box<Hitable>> {
     list
 }
 
-#[allow(dead_code)]
 pub fn random_scene() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(488);
     list.extend(gen_random_spheres());
@@ -146,7 +145,6 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
     list
 }
 
-#[allow(dead_code)]
 pub fn simple_light() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(4);
 
@@ -192,7 +190,6 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
     list
 }
 
-#[allow(dead_code)]
 pub fn cornell_box() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
 
@@ -293,7 +290,6 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
     list
 }
 
-#[allow(dead_code)]
 pub fn cornell_smoke() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
 
@@ -400,6 +396,31 @@ pub fn cornell_smoke() -> Vec<Box<Hitable>> {
         center: Vec3::new(350.0, 400.0, 295.0),
         radius: 50.0,
         material: material::dielectric(1.5),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    list
+}
+
+pub fn two_perlin_spheres() -> Vec<Box<Hitable>> {
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(2);
+    let texture = NoiseTexture::new();
+
+    Sphere {
+        center: Vec3::new(0.0, -1000.0, 0.0),
+        radius: 1000.0,
+        material: Lambertion {
+            albedo: texture.box_clone(),
+        },
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    Sphere {
+        center: Vec3::new(0.0, 2.0, 0.0),
+        radius: 2.0,
+        material: Lambertion {
+            albedo: texture.box_clone(),
+        },
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
