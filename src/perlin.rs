@@ -19,7 +19,7 @@ impl Perlin {
         }
     }
 
-    pub fn noise(&self, p: Vec3) -> f32 {
+    pub fn noise(&self, p: &Vec3) -> f32 {
         let u = p.x - p.x.floor();
         let v = p.y - p.y.floor();
         let w = p.z - p.z.floor();
@@ -58,7 +58,19 @@ impl Perlin {
                 }
             }
         }
-        (accum + 1.0) * 0.5
+        accum
+    }
+
+    pub fn turb(&self, p: &Vec3, depth: i8) -> f32 {
+        let mut accum = 0.0;
+        let mut temp_p = *p;
+        let mut weight = 1.0;
+        for _ in 0..depth {
+            accum += weight * self.noise(&temp_p);
+            weight *= 0.5;
+            temp_p *= 2.0;
+        }
+        accum.abs()
     }
 
     fn gen_rand_vec3_list() -> [Vec3; 256] {
