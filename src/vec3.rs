@@ -20,11 +20,12 @@ impl Vec3 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
-    pub fn make_unit_vector(&mut self) {
-        let k = 1.0 / (self.x * self.x + self.y * self.y + self.z * self.z).sqrt();
+    pub fn make_unit_vector(mut self) -> Self {
+        let k = 1.0 / self.length();
         self.x *= k;
         self.y *= k;
         self.z *= k;
+        self
     }
 
     /// Field access by index 0: x, 1: y, 2: z
