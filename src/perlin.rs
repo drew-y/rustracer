@@ -1,9 +1,9 @@
-use super::vec3::Vec3;
+use super::vec3::{dot, Vec3};
 use rand::{prelude::*, seq::SliceRandom};
 
 #[derive(Copy, Clone)]
 pub struct Perlin {
-    rand_float: [f32; 256],
+    rand_vec3: [Vec3; 256],
     x: [i32; 256],
     y: [i32; 256],
     z: [i32; 256],
@@ -12,10 +12,10 @@ pub struct Perlin {
 impl Perlin {
     pub fn new() -> Perlin {
         Perlin {
-            rand_float: Self::gen_float_list(),
-            x: Self::gen_int_list(),
-            y: Self::gen_int_list(),
-            z: Self::gen_int_list(),
+            rand_vec3: Self::gen_rand_vec3_list(),
+            x: Self::gen_rand_int_list(),
+            y: Self::gen_rand_int_list(),
+            z: Self::gen_rand_int_list(),
         }
     }
 
@@ -26,42 +26,51 @@ impl Perlin {
         let i = p.x.floor();
         let j = p.y.floor();
         let k = p.z.floor();
-        let mut c: [[[f32; 2]; 2]; 2] = [[[0.0; 2]; 2]; 2];
+        let mut c = [[[Vec3::new(0.0, 0.0, 0.0); 2]; 2]; 2];
         for di in 0..2 {
             for dj in 0..2 {
                 for dk in 0..2 {
                     let x_index = ((i as i32 + di as i32) & 255) as usize;
                     let y_index = ((j as i32 + dj as i32) & 255) as usize;
                     let z_index = ((k as i32 + dk as i32) & 255) as usize;
-                    let rand_float_index =
+                    let rand_vec3_index =
                         (self.x[x_index] ^ self.y[y_index] ^ self.z[z_index]) as usize;
-                    c[di][dj][dk] = self.rand_float[rand_float_index];
+                    c[di][dj][dk] = self.rand_vec3[rand_vec3_index];
                 }
             }
         }
-        Self::trilinear_interp(&c, u, v, w)
+        Self::perlin_interp(&c, u, v, w)
     }
 
-    fn trilinear_interp(c: &[[[f32; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 {
+    fn perlin_interp(c: &[[[Vec3; 2]; 2]; 2], u: f32, v: f32, w: f32) -> f32 {
+        let uu = u * u * (3.0 - 2.0 * u);
+        let vv = v * v * (3.0 - 2.0 * v);
+        let ww = w * w * (3.0 - 2.0 * w);
         let mut accum = 0.0;
         for i in 0..2 {
             for j in 0..2 {
                 for k in 0..2 {
-                    accum += (i as f32 * u + (1.0 - i as f32) * (1.0 - u))
-                        * (j as f32 * v + (1.0 - j as f32) * (1.0 - v))
-                        * (k as f32 * w + (1.0 - k as f32) * (1.0 - w))
-                        * c[i][j][k];
+                    let weight_v = Vec3::new(u - i as f32, v - j as f32, w - k as f32);
+                    accum += (i as f32 * uu + (1.0 - i as f32) * (1.0 - uu))
+                        * (j as f32 * vv + (1.0 - j as f32) * (1.0 - vv))
+                        * (k as f32 * ww + (1.0 - k as f32) * (1.0 - ww))
+                        * dot(&c[i][j][k], &weight_v);
                 }
             }
         }
         accum
     }
 
-    fn gen_float_list() -> [f32; 256] {
-        let mut p: [f32; 256] = [0.0; 256];
+    fn gen_rand_vec3_list() -> [Vec3; 256] {
+        let mut p: [Vec3; 256] = [Vec3::new(0.0, 0.0, 0.0); 256];
         let mut rng = thread_rng();
         for i in 0..256 {
-            p[i] = rng.gen::<f32>();
+            p[i] = Vec3::new(
+                -1.0 + 2.0 * rng.gen::<f32>(),
+                -1.0 + 2.0 * rng.gen::<f32>(),
+                -1.0 + 2.0 * rng.gen::<f32>(),
+            )
+            .make_unit_vector();
         }
         p
     }
@@ -71,7 +80,7 @@ impl Perlin {
         p.shuffle(&mut rng);
     }
 
-    fn gen_int_list() -> [i32; 256] {
+    fn gen_rand_int_list() -> [i32; 256] {
         let mut p: [i32; 256] = [0; 256];
         for i in 0..256 {
             p[i] = i as i32;
