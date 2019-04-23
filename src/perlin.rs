@@ -58,7 +58,7 @@ impl Perlin {
                 }
             }
         }
-        accum
+        (accum + 1.0) * 0.5
     }
 
     fn gen_rand_vec3_list() -> [Vec3; 256] {

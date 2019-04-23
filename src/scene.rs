@@ -404,7 +404,7 @@ pub fn cornell_smoke() -> Vec<Box<Hitable>> {
 
 pub fn two_perlin_spheres() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(2);
-    let texture = NoiseTexture::new(4.5);
+    let texture = NoiseTexture::new(10.0);
 
     Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),

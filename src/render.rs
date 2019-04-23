@@ -67,9 +67,9 @@ pub fn render<T: Hitable>(scene: Scene) -> Vec<u8> {
             col.x = col.x.sqrt();
             col.y = col.y.sqrt();
             col.z = col.z.sqrt();
-            file.push((255.99 * col.x).min(255.0) as u8);
-            file.push((255.99 * col.y).min(255.0) as u8);
-            file.push((255.99 * col.z).min(255.0) as u8);
+            file.push((255.99 * col.x).max(0.0).min(255.0) as u8);
+            file.push((255.99 * col.y).max(0.0).min(255.0) as u8);
+            file.push((255.99 * col.z).max(0.0).min(255.0) as u8);
         }
     }
     file
