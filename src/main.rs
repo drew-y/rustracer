@@ -15,7 +15,7 @@ mod vec3;
 use camera::{Camera, CameraOpts};
 use geometry::bvh::BVHNode;
 use hitable::Hitable;
-use png::HasParameters;
+use image::png::PNGEncoder;
 use render::{render, Scene};
 use scene::two_perlin_spheres;
 use std::io;
@@ -70,9 +70,12 @@ fn main() {
         file.extend(render_thread.join().unwrap());
     }
 
-    let ref mut w = BufWriter::new(io::stdout());
-    let mut encoder = png::Encoder::new(w, nx as u32, ny as u32);
-    encoder.set(png::ColorType::RGB).set(png::BitDepth::Eight);
-    let mut writer = encoder.write_header().unwrap();
-    writer.write_image_data(&file).unwrap();
+    let w = BufWriter::new(io::stdout());
+    let encoder = PNGEncoder::new(w);
+    match encoder.encode(&file, nx as u32, ny as u32, image::ColorType::RGB(8)) {
+        Err(e) => {
+            println!("Error: {}", e);
+        }
+        _ => {}
+    }
 }
