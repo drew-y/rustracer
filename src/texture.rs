@@ -94,9 +94,7 @@ impl NoiseTexture {
 
 impl Texture for NoiseTexture {
     fn value(&self, _u: f32, _v: f32, p: Vec3) -> Vec3 {
-        Vec3::new(1.0, 1.0, 1.0)
-            * 0.5
-            * (1.0 + (self.scale * p.z + 10.0 * self.noise.turb(&p, 7)).sin())
+        Vec3::new(1.0, 1.0, 1.0) * 3.0 * self.noise.turb(&(self.scale * p), 7).sin()
     }
 
     fn box_clone(&self) -> Box<Texture> {

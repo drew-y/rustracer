@@ -497,7 +497,7 @@ pub fn rttnw_final_scene() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, 150.0, 145.0),
         radius: 50.0,
-        material: material::metal(Vec3::new(0.8, 0.8, 0.9), 10.0),
+        material: material::metal(Vec3::new(0.8, 0.8, 0.9), 0.7),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
