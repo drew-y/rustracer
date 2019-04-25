@@ -1,7 +1,7 @@
 use super::hitable::HitRecord;
 use super::ray::Ray;
-use super::texture::{ConstantTexture, Texture};
-use super::utils::random_in_unit_sphere;
+use super::texture::{ConstantTexture, ImageTexture, Texture};
+use super::utils::{random_in_unit_sphere, read_image};
 use super::vec3::{dot, unit_vector, Vec3};
 use rand::prelude::*;
 
@@ -134,6 +134,18 @@ impl Material {
 pub fn lambertion(r: f32, g: f32, b: f32) -> Material {
     Material::Lambertion {
         albedo: Box::new(ConstantTexture::new(r, g, b)),
+    }
+}
+
+pub fn lambertion_with_image(path: &str) -> Material {
+    let image = read_image(path.to_string());
+    Material::Lambertion {
+        albedo: ImageTexture {
+            image: image.0,
+            nx: image.1,
+            ny: image.2,
+        }
+        .box_clone(),
     }
 }
 

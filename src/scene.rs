@@ -8,11 +8,10 @@ use super::{
     },
     hitable::Hitable,
     material::{
-        self, dielectric, diffuse_light, isotropic, lambertion,
+        self, dielectric, diffuse_light, isotropic, lambertion, lambertion_with_image,
         Material::{Lambertion, Metal},
     },
-    texture::{CheckerTexture, ConstantTexture, ImageTexture, NoiseTexture, Texture},
-    utils::read_image,
+    texture::{CheckerTexture, ConstantTexture, NoiseTexture, Texture},
     vec3::Vec3,
 };
 use rand::prelude::*;
@@ -440,18 +439,10 @@ pub fn earth() -> Vec<Box<Hitable>> {
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
-    let image = read_image("./earth.png".to_string());
     Sphere {
         center: Vec3::new(0.0, 2.0, 0.0),
         radius: 2.0,
-        material: Lambertion {
-            albedo: ImageTexture {
-                image: image.0,
-                nx: image.1,
-                ny: image.2,
-            }
-            .box_clone(),
-        },
+        material: lambertion_with_image("./earthmap.jpg"),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
