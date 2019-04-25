@@ -14,7 +14,7 @@ fn sky_background(r: &Ray) -> Vec3 {
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     if let Some(rec) = world.hit(r, 0.001, MAX) {
-        let emitted = rec.material.emitted(0.0, 0.0, rec.p);
+        let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
         if depth >= 50 {
             return emitted;
         }
