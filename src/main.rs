@@ -17,7 +17,7 @@ use geometry::bvh::BVHNode;
 use hitable::Hitable;
 use image::png::PNGEncoder;
 use render::{render, Scene};
-use scene::earth;
+use scene::rttnw_final_scene;
 use std::io;
 use std::io::BufWriter;
 use std::sync::Arc;
@@ -27,19 +27,19 @@ use vec3::Vec3;
 fn main() {
     let nx: i32 = 800;
     let ny: i32 = 800;
-    let ns: i32 = 50;
+    let ns: i32 = 10000;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let world = Arc::new(BVHNode::new(earth()));
+    let world = Arc::new(BVHNode::new(rttnw_final_scene()));
 
     let cam = Camera::new(CameraOpts {
-        lookfrom: Vec3::new(13.0, 2.0, 3.0),
-        lookat: Vec3::new(0.0, 0.0, 0.0),
+        lookfrom: Vec3::new(478.0, 278.0, -600.0),
+        lookat: Vec3::new(278.0, 278.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
         focus_dist: 10.0,
         aperture: 0.0,
-        vfow: 20.0,
+        vfow: 40.0,
     });
 
     let thread_count = 8;

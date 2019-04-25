@@ -3,6 +3,7 @@ use super::super::{
     hitable::{HitRecord, Hitable},
     ray::Ray,
 };
+use super::translation::Translation;
 use rand::prelude::*;
 use std::cmp::Ordering;
 
@@ -142,3 +143,5 @@ impl Hitable for BVHNode {
         self.bbox
     }
 }
+
+impl Translation for BVHNode {}

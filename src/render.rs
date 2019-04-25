@@ -6,6 +6,7 @@ use rand::prelude::*;
 use std::f32::MAX;
 use std::sync::Arc;
 
+#[allow(dead_code)]
 fn sky_background(r: &Ray) -> Vec3 {
     let unit_direction = unit_vector(&r.direction);
     let t = 0.5 * (unit_direction.y + 1.0);
@@ -24,8 +25,8 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
             emitted
         }
     } else {
-        // Vec3::new(0.0, 0.0, 0.0) // Black background
-        sky_background(r)
+        Vec3::new(0.0, 0.0, 0.0) // Black background
+                                 // sky_background(r)
     }
 }
 
