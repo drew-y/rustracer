@@ -1,14 +1,27 @@
 # Rustracer - A Path Tracer Written In Rust
 
+<p align="center">
+  <img width="500" src="./rttnw_final_scene.png">
+</p>
+
 This is a basic ray / path tracer written in rust. It is based off of
 the book *Ray Tracing in One Weekend* by Peter Shirley, [available here](https://www.amazon.com/Ray-Tracing-Weekend-Minibooks-Book-ebook/dp/B01B5AODD8/ref=sr_1_1?crid=2M1LIGDUSI1DY&keywords=ray+tracing+in+one+weekend&qid=1554232233&s=gateway&sprefix=ray+tracing+in+%2Caps%2C209&sr=8-1).
 
-This project is primarly meant for me to learn rust. So far the code covers
-book 1. But I plan on following along with book 2 and 3 as well.
+This repo follows all the way through book two, with the exception that
+moving spheres were removed.
+
+## Usage
+
+```bash
+cargo run --release > rttnw_final_scene2.png
+```
 
 ## Performace
 
-**v1.1.0 (Multi Threaded):**
+This section is based off the first book in the series and applies to the v1.1.1
+tag only.
+
+**v1.1.1 (Multi Threaded):**
 
 After adding support for multi-threading, rustrace is now super *duper* fast.
 
