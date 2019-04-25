@@ -1,7 +1,7 @@
 # Rustracer - A Path Tracer Written In Rust
 
 <p align="center">
-  <img width="500" src="./rttnw_final_scene.png">
+  <img width="400" src="./rttnw_final_scene.png">
 </p>
 
 This is a basic ray / path tracer written in rust. It is based off of
