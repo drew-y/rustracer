@@ -17,7 +17,7 @@ use geometry::bvh::BVHNode;
 use hitable::Hitable;
 use image::png::PNGEncoder;
 use render::{render, Scene};
-use scene::two_perlin_spheres;
+use scene::earth;
 use std::io;
 use std::io::BufWriter;
 use std::sync::Arc;
@@ -30,7 +30,7 @@ fn main() {
     let ns: i32 = 50;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let world = Arc::new(BVHNode::new(two_perlin_spheres()));
+    let world = Arc::new(BVHNode::new(earth()));
 
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(13.0, 2.0, 3.0),
@@ -74,7 +74,8 @@ fn main() {
     let encoder = PNGEncoder::new(w);
     match encoder.encode(&file, nx as u32, ny as u32, image::ColorType::RGB(8)) {
         Err(e) => {
-            println!("Error: {}", e);
+            eprintln!("Error: {}", e);
+            std::process::exit(1);
         }
         _ => {}
     }

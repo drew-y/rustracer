@@ -27,10 +27,12 @@ impl Hitable for XYRect {
         if x < self.x0 || x > self.x1 || y < self.y0 || y > self.y1 {
             return None;
         };
-        // let u = (x - self.x0) / (self.x1 - self.x0); // TODO (Use this)
-        // let v = (y - self.y0) / (self.y1 - self.y0); // TODO (Use this)
+        let u = (x - self.x0) / (self.x1 - self.x0);
+        let v = (y - self.y0) / (self.y1 - self.y0);
         Some(HitRecord {
             t,
+            u,
+            v,
             p: r.point_at_parameter(t),
             material: &self.material,
             normal: Vec3::new(0.0, 0.0, 1.0),
@@ -67,10 +69,12 @@ impl Hitable for XZRect {
         if x < self.x0 || x > self.x1 || z < self.z0 || z > self.z1 {
             return None;
         };
-        // let u = (x - self.x0) / (self.x1 - self.x0); // TODO (Use this)
-        // let v = (z - self.z0) / (self.z1 - self.z0); // TODO (Use this)
+        let u = (x - self.x0) / (self.x1 - self.x0);
+        let v = (z - self.z0) / (self.z1 - self.z0);
         Some(HitRecord {
             t,
+            u,
+            v,
             p: r.point_at_parameter(t),
             material: &self.material,
             normal: Vec3::new(0.0, 1.0, 0.0),
@@ -107,8 +111,14 @@ impl Hitable for YZRect {
         if y < self.y0 || y > self.y1 || z < self.z0 || z > self.z1 {
             return None;
         };
+
+        let u = (y - self.y0) / (self.y1 - self.y0);
+        let v = (z - self.z0) / (self.z1 - self.z0);
+
         Some(HitRecord {
             t,
+            u,
+            v,
             p: r.point_at_parameter(t),
             material: &self.material,
             normal: Vec3::new(1.0, 0.0, 0.0),

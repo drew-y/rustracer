@@ -11,7 +11,8 @@ use super::{
         self, dielectric, diffuse_light, isotropic, lambertion,
         Material::{Lambertion, Metal},
     },
-    texture::{CheckerTexture, ConstantTexture, NoiseTexture, Texture},
+    texture::{CheckerTexture, ConstantTexture, ImageTexture, NoiseTexture, Texture},
+    utils::read_image,
     vec3::Vec3,
 };
 use rand::prelude::*;
@@ -420,6 +421,36 @@ pub fn two_perlin_spheres() -> Vec<Box<Hitable>> {
         radius: 2.0,
         material: Lambertion {
             albedo: texture.box_clone(),
+        },
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    list
+}
+
+pub fn earth() -> Vec<Box<Hitable>> {
+    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(2);
+
+    Sphere {
+        center: Vec3::new(0.0, -1000.0, 0.0),
+        radius: 1000.0,
+        material: Lambertion {
+            albedo: NoiseTexture::new(4.0).box_clone(),
+        },
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    let image = read_image("./earth.png".to_string());
+    Sphere {
+        center: Vec3::new(0.0, 2.0, 0.0),
+        radius: 2.0,
+        material: Lambertion {
+            albedo: ImageTexture {
+                image: image.0,
+                nx: image.1,
+                ny: image.2,
+            }
+            .box_clone(),
         },
     }
     .push_into_list_of_boxed_hitables(&mut list);

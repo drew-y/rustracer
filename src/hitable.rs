@@ -14,6 +14,8 @@ pub trait Hitable: Sync + Send {
 #[derive(Copy, Clone)]
 pub struct HitRecord<'a> {
     pub t: f32,
+    pub u: f32,
+    pub v: f32,
     pub p: Vec3,
     pub normal: Vec3,
     pub material: &'a Material,

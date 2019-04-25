@@ -6,12 +6,23 @@ use super::super::{
     vec3::{dot, Vec3},
 };
 use super::translation::Translation;
+use std::f32::consts::PI;
 use std::ops::Deref;
 
 pub struct Sphere {
     pub center: Vec3,
     pub radius: f32,
     pub material: Material,
+}
+
+impl Sphere {
+    fn get_sphere_uv(p: &Vec3) -> (f32, f32) {
+        let phi = p.z.atan2(p.x);
+        let theta = p.y.asin();
+        let u = 1.0 - (phi + PI) / (2.0 * PI);
+        let v = (theta + PI / 2.0) / PI;
+        (u, v)
+    }
 }
 
 impl Hitable for Sphere {
@@ -25,11 +36,15 @@ impl Hitable for Sphere {
             let test = |t: f32| t < t_max && t > t_min;
             let gen_hit_record = |t: f32| {
                 let p = r.point_at_parameter(t);
+                let normal = (p - self.center) / self.radius;
+                let (u, v) = Self::get_sphere_uv(&normal);
                 Some(HitRecord {
                     t,
+                    u,
+                    v,
                     p,
                     material: &self.material,
-                    normal: (p - self.center) / self.radius,
+                    normal,
                 })
             };
 

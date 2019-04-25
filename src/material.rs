@@ -18,7 +18,7 @@ impl Material {
     fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
         let target = rec.p + rec.normal + random_in_unit_sphere();
         return Some((
-            albedo.value(0.0, 0.0, rec.p),
+            albedo.value(rec.u, rec.v, rec.p),
             Ray {
                 origin: rec.p,
                 direction: target - rec.p,
@@ -108,7 +108,7 @@ impl Material {
             direction: random_in_unit_sphere(),
         };
 
-        let attenuation = albedo.value(0.0, 0.0, rec.p);
+        let attenuation = albedo.value(rec.u, rec.v, rec.p);
         Some((attenuation, scattered))
     }
 

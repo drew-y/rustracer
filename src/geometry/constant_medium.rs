@@ -38,6 +38,8 @@ impl<T: Hitable> Hitable for ConstantMedium<T> {
             let t = rec1.t + hit_distance / r.direction.length();
             Some(HitRecord {
                 t,
+                u: 0.0,
+                v: 0.0,
                 p: r.point_at_parameter(t),
                 normal: Vec3::new(1.0, 0.0, 0.0),
                 material: &self.phase_function,
