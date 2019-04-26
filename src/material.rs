@@ -66,40 +66,39 @@ impl Material {
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
         let dir_dot_norm = r.direction.dot(&rec.normal);
         let (outward_normal, ni_over_nt, cosine) = if dir_dot_norm > 0.0 {
-            (
-                -rec.normal,
-                ref_idx,
-                ref_idx * dir_dot_norm / r.direction.length(),
-            )
+            let cosine = ref_idx * dir_dot_norm / r.direction.length();
+            (-rec.normal, ref_idx, cosine)
         } else {
-            (
-                rec.normal,
-                1.0 / ref_idx,
-                -dir_dot_norm / r.direction.length(),
-            )
+            let cosine = -dir_dot_norm / r.direction.length();
+            (rec.normal, 1.0 / ref_idx, cosine)
         };
 
-        let mut rng = thread_rng();
-        if let Some(refracted) = Material::refract(&r.direction, &outward_normal, ni_over_nt) {
-            let reflect_prob = Material::schlick(cosine, ref_idx);
-            if rng.gen::<f32>() >= reflect_prob {
-                return Some((
-                    attenuation,
-                    Ray {
-                        origin: rec.p,
-                        direction: refracted,
-                    },
-                ));
-            }
-        }
-
-        Some((
+        let reflection = Some((
             attenuation,
             Ray {
                 origin: rec.p,
                 direction: reflected,
             },
-        ))
+        ));
+
+        let maybe_refracted = Material::refract(&r.direction, &outward_normal, ni_over_nt);
+        let refracted = match maybe_refracted {
+            Some(refracted) => refracted,
+            None => return reflection,
+        };
+
+        let reflect_prob = Material::schlick(cosine, ref_idx);
+        if random::<f32>() >= reflect_prob {
+            return Some((
+                attenuation,
+                Ray {
+                    origin: rec.p,
+                    direction: refracted,
+                },
+            ));
+        }
+
+        reflection
     }
 
     fn isotropic_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {

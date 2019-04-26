@@ -27,7 +27,7 @@ use vec3::Vec3;
 fn main() {
     let nx: i32 = 400;
     let ny: i32 = 400;
-    let ns: i32 = 400;
+    let ns: i32 = 40;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
     let world = Arc::new(BVHNode::new(rttnw_final_scene()));
