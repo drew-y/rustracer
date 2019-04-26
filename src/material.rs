@@ -1,7 +1,7 @@
 use super::hitable::HitRecord;
 use super::ray::Ray;
 use super::texture::{ConstantTexture, ImageTexture, Texture};
-use super::utils::{random_in_unit_sphere, read_image};
+use super::utils::read_image;
 use super::vec3::Vec3;
 use rand::prelude::*;
 
@@ -16,7 +16,7 @@ pub enum Material {
 
 impl Material {
     fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
-        let target = rec.p + rec.normal + random_in_unit_sphere();
+        let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
         return Some((
             albedo.value(rec.u, rec.v, rec.p),
             Ray {
@@ -45,7 +45,7 @@ impl Material {
         let reflected = Material::reflect(&r.direction.unit_vector(), &rec.normal);
         let scattered = Ray {
             origin: rec.p,
-            direction: reflected + fuzz * random_in_unit_sphere(),
+            direction: reflected + fuzz * Vec3::random_in_unit_sphere(),
         };
 
         if scattered.direction.dot(&rec.normal) > 0.0 {
@@ -105,7 +105,7 @@ impl Material {
     fn isotropic_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
         let scattered = Ray {
             origin: rec.p,
-            direction: random_in_unit_sphere(),
+            direction: Vec3::random_in_unit_sphere(),
         };
 
         let attenuation = albedo.value(rec.u, rec.v, rec.p);

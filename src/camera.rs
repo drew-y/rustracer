@@ -1,6 +1,5 @@
 use super::ray::Ray;
 use super::vec3::Vec3;
-use rand::prelude::*;
 use std::f32::consts::PI;
 
 #[derive(Copy, Clone, Debug)]
@@ -26,17 +25,6 @@ pub struct CameraOpts {
 }
 
 impl Camera {
-    fn ranom_in_unit_disk() -> Vec3 {
-        let mut rng = thread_rng();
-        let mut rnd = || rng.gen::<f32>();
-        let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
-        let mut p = sample();
-        while p.dot(&p) >= 1.0 {
-            p = sample()
-        }
-        p
-    }
-
     pub fn new(
         CameraOpts {
             lookfrom,
@@ -70,7 +58,7 @@ impl Camera {
     }
 
     pub fn get_ray(&self, s: f32, t: f32) -> Ray {
-        let rd = self.lens_radius * Camera::ranom_in_unit_disk();
+        let rd = self.lens_radius * Vec3::random_in_unit_disk();
         let offset = self.u * rd.x + self.v * rd.y;
         Ray {
             origin: self.origin + offset,

@@ -1,3 +1,4 @@
+use rand::prelude::*;
 use std::{fmt, ops};
 
 #[derive(Clone, Copy, Debug)]
@@ -10,6 +11,28 @@ pub struct Vec3 {
 impl Vec3 {
     pub fn new(x: f32, y: f32, z: f32) -> Vec3 {
         Vec3 { x, y, z }
+    }
+
+    pub fn random_in_unit_sphere() -> Vec3 {
+        let mut rng = thread_rng();
+        let mut rnd = || rng.gen::<f32>();
+        let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), rnd()) - Vec3::new(1.0, 1.0, 1.0);
+        let mut p = sample();
+        while p.squared_length() >= 1.0 {
+            p = sample();
+        }
+        p
+    }
+
+    pub fn random_in_unit_disk() -> Vec3 {
+        let mut rng = thread_rng();
+        let mut rnd = || rng.gen::<f32>();
+        let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
+        let mut p = sample();
+        while p.dot(&p) >= 1.0 {
+            p = sample()
+        }
+        p
     }
 
     pub fn dot(&self, v2: &Vec3) -> f32 {
