@@ -3,7 +3,7 @@ use super::super::{
     hitable::{HitRecord, Hitable},
     material::Material,
     ray::Ray,
-    vec3::{dot, Vec3},
+    vec3::Vec3,
 };
 use super::translation::Translation;
 use std::f32::consts::PI;
@@ -29,9 +29,9 @@ impl Sphere {
 impl Hitable for Sphere {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let oc = r.origin - self.center;
-        let a = dot(&r.direction, &r.direction);
-        let b = dot(&oc, &r.direction);
-        let c = dot(&oc, &oc) - self.radius * self.radius;
+        let a = r.direction.dot(&r.direction);
+        let b = oc.dot(&r.direction);
+        let c = oc.dot(&oc) - self.radius * self.radius;
         let discriminant = b * b - a * c;
         if discriminant > 0.0 {
             let test = |t: f32| t < t_max && t > t_min;

@@ -1,14 +1,14 @@
 use super::camera::Camera;
 use super::hitable::Hitable;
 use super::ray::Ray;
-use super::vec3::{unit_vector, Vec3};
+use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::MAX;
 use std::sync::Arc;
 
 #[allow(dead_code)]
 fn sky_background(r: &Ray) -> Vec3 {
-    let unit_direction = unit_vector(&r.direction);
+    let unit_direction = &r.direction.unit_vector();
     let t = 0.5 * (unit_direction.y + 1.0);
     (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
 }

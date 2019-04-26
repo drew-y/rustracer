@@ -1,5 +1,5 @@
 use super::ray::Ray;
-use super::vec3::{cross, dot, unit_vector, Vec3};
+use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::consts::PI;
 
@@ -31,7 +31,7 @@ impl Camera {
         let mut rnd = || rng.gen::<f32>();
         let mut sample = || 2.0 * Vec3::new(rnd(), rnd(), 0.0) - Vec3::new(1.0, 1.0, 0.0);
         let mut p = sample();
-        while dot(&p, &p) >= 1.0 {
+        while p.dot(&p) >= 1.0 {
             p = sample()
         }
         p
@@ -51,9 +51,9 @@ impl Camera {
         let theta = vfow * PI / 180.0;
         let half_height = (theta / 2.0).tan();
         let half_width = aspect * half_height;
-        let w = unit_vector(&(lookfrom - lookat));
-        let u = unit_vector(&cross(&vup, &w));
-        let v = cross(&w, &u);
+        let w = (lookfrom - lookat).unit_vector();
+        let u = vup.cross(&w).unit_vector();
+        let v = w.cross(&u);
         Camera {
             lower_left_corner: lookfrom
                 - half_width * focus_dist * u

@@ -2,7 +2,7 @@ use super::hitable::HitRecord;
 use super::ray::Ray;
 use super::texture::{ConstantTexture, ImageTexture, Texture};
 use super::utils::{random_in_unit_sphere, read_image};
-use super::vec3::{dot, unit_vector, Vec3};
+use super::vec3::Vec3;
 use rand::prelude::*;
 
 #[derive(Clone)]
@@ -27,12 +27,12 @@ impl Material {
     }
 
     fn reflect(v: &Vec3, n: &Vec3) -> Vec3 {
-        v - 2.0 * dot(v, n) * n
+        v - 2.0 * v.dot(n) * n
     }
 
     fn refract(v: &Vec3, n: &Vec3, ni_over_nt: f32) -> Option<Vec3> {
-        let uv = unit_vector(v);
-        let dt = dot(&uv, n);
+        let uv = v.unit_vector();
+        let dt = uv.dot(n);
         let discriminant = 1.0 - ni_over_nt * ni_over_nt * (1.0 - dt * dt);
         if discriminant > 0.0 {
             Some(ni_over_nt * (uv - n * dt) - n * discriminant.sqrt())
@@ -42,13 +42,13 @@ impl Material {
     }
 
     fn metal_scatter(r: &Ray, rec: &HitRecord, albedo: &Vec3, fuzz: f32) -> Option<(Vec3, Ray)> {
-        let reflected = Material::reflect(&unit_vector(&r.direction), &rec.normal);
+        let reflected = Material::reflect(&r.direction.unit_vector(), &rec.normal);
         let scattered = Ray {
             origin: rec.p,
             direction: reflected + fuzz * random_in_unit_sphere(),
         };
 
-        if dot(&scattered.direction, &rec.normal) > 0.0 {
+        if scattered.direction.dot(&rec.normal) > 0.0 {
             Some((*albedo, scattered))
         } else {
             None
@@ -64,18 +64,18 @@ impl Material {
     fn dielectric_scatter(r: &Ray, rec: &HitRecord, ref_idx: f32) -> Option<(Vec3, Ray)> {
         let reflected = Material::reflect(&r.direction, &rec.normal);
         let attenuation = Vec3::new(1.0, 1.0, 1.0);
-
-        let (outward_normal, ni_over_nt, cosine) = if dot(&r.direction, &rec.normal) > 0.0 {
+        let dir_dot_norm = r.direction.dot(&rec.normal);
+        let (outward_normal, ni_over_nt, cosine) = if dir_dot_norm > 0.0 {
             (
                 -rec.normal,
                 ref_idx,
-                ref_idx * dot(&r.direction, &rec.normal) / r.direction.length(),
+                ref_idx * dir_dot_norm / r.direction.length(),
             )
         } else {
             (
                 rec.normal,
                 1.0 / ref_idx,
-                -dot(&r.direction, &rec.normal) / r.direction.length(),
+                -dir_dot_norm / r.direction.length(),
             )
         };
 
@@ -168,6 +168,7 @@ pub fn diffuse_light(r: f32, g: f32, b: f32) -> Material {
     }
 }
 
+/// Create a basic isotropic material
 pub fn isotropic(r: f32, g: f32, b: f32) -> Material {
     Material::Isotropic {
         albedo: Box::new(ConstantTexture::new(r, g, b)),

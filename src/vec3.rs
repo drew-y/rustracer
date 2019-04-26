@@ -12,6 +12,18 @@ impl Vec3 {
         Vec3 { x, y, z }
     }
 
+    pub fn dot(&self, v2: &Vec3) -> f32 {
+        self.x * v2.x + self.y * v2.y + self.z * v2.z
+    }
+
+    pub fn cross(&self, v2: &Vec3) -> Vec3 {
+        Vec3 {
+            x: self.y * v2.z - self.z * v2.y,
+            y: -(self.x * v2.z - self.z * v2.x),
+            z: self.x * v2.y - self.y * v2.x,
+        }
+    }
+
     pub fn length(&self) -> f32 {
         self.squared_length().sqrt()
     }
@@ -20,6 +32,12 @@ impl Vec3 {
         self.x * self.x + self.y * self.y + self.z * self.z
     }
 
+    /// Return a unit vector version of this Vec3
+    pub fn unit_vector(&self) -> Vec3 {
+        self / self.length()
+    }
+
+    /// Converts this Vec3 to a unit vector
     pub fn make_unit_vector(mut self) -> Self {
         let k = 1.0 / self.length();
         self.x *= k;
@@ -47,22 +65,6 @@ impl Vec3 {
             _ => panic!("Invalid Vec3 index"),
         }
     }
-}
-
-pub fn dot(v1: &Vec3, v2: &Vec3) -> f32 {
-    v1.x * v2.x + v1.y * v2.y + v1.z * v2.z
-}
-
-pub fn cross(v1: &Vec3, v2: &Vec3) -> Vec3 {
-    Vec3 {
-        x: v1.y * v2.z - v1.z * v2.y,
-        y: -(v1.x * v2.z - v1.z * v2.x),
-        z: v1.x * v2.y - v1.y * v2.x,
-    }
-}
-
-pub fn unit_vector(v: &Vec3) -> Vec3 {
-    v / v.length()
 }
 
 impl fmt::Display for Vec3 {

@@ -1,4 +1,4 @@
-use super::vec3::{dot, Vec3};
+use super::vec3::Vec3;
 use rand::{prelude::*, seq::SliceRandom};
 
 #[derive(Copy, Clone)]
@@ -54,7 +54,7 @@ impl Perlin {
                     accum += (i as f32 * uu + (1.0 - i as f32) * (1.0 - uu))
                         * (j as f32 * vv + (1.0 - j as f32) * (1.0 - vv))
                         * (k as f32 * ww + (1.0 - k as f32) * (1.0 - ww))
-                        * dot(&c[i][j][k], &weight_v);
+                        * c[i][j][k].dot(&weight_v);
                 }
             }
         }
