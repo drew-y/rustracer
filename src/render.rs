@@ -1,10 +1,9 @@
-use super::camera::Camera;
 use super::hitable::Hitable;
 use super::ray::Ray;
+use super::scene::Scene;
 use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::MAX;
-use std::sync::Arc;
 
 #[allow(dead_code)]
 fn sky_background(r: &Ray) -> Vec3 {
@@ -32,27 +31,14 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     emitted + attenuation * color(&scattered, world, depth + 1)
 }
 
-pub struct Scene<'a> {
-    pub starty: i32,
-    pub endy: i32,
-    pub nx: i32,
-    pub ny: i32,
-    pub ns: i32,
-    pub cam: &'a Camera,
-    pub hitable: Arc<Hitable>,
-}
-
-pub fn render<T: Hitable>(scene: Scene) -> Vec<u8> {
-    let mut file: Vec<u8> =
-        Vec::with_capacity((scene.endy - scene.starty) as usize * scene.nx as usize * 3);
+pub fn render(scene: Scene, starty: i32, endy: i32) -> Vec<u8> {
+    let mut file: Vec<u8> = Vec::with_capacity((endy - starty) as usize * scene.nx as usize * 3);
     let Scene {
         ns,
         nx,
         ny,
         cam,
-        hitable,
-        starty,
-        endy,
+        world,
     } = scene;
     let mut rng = thread_rng();
 
@@ -63,7 +49,7 @@ pub fn render<T: Hitable>(scene: Scene) -> Vec<u8> {
                 let u = (i as f32 + rng.gen::<f32>()) / nx as f32;
                 let v = (j as f32 + rng.gen::<f32>()) / ny as f32;
                 let r = cam.get_ray(u, v);
-                col += color(&r, &hitable, 0);
+                col += color(&r, &world, 0);
             }
 
             col /= ns as f32;

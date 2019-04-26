@@ -1,4 +1,5 @@
 use super::{
+    camera::{Camera, CameraOpts},
     geometry::{
         box_geo::BoxGeo,
         bvh::BVHNode,
@@ -16,6 +17,16 @@ use super::{
     vec3::Vec3,
 };
 use rand::prelude::*;
+use std::sync::Arc;
+
+#[derive(Clone)]
+pub struct Scene {
+    pub nx: i32,
+    pub ny: i32,
+    pub ns: i32,
+    pub cam: Camera,
+    pub world: Arc<Hitable>,
+}
 
 fn gen_coords() -> [(i32, i32); 484] {
     let mut coords: [(i32, i32); 484] = [(0, 0); 484];
@@ -450,7 +461,7 @@ pub fn earth() -> Vec<Box<Hitable>> {
     list
 }
 
-pub fn rttnw_final_scene() -> Vec<Box<Hitable>> {
+fn rttnw_final_world() -> Arc<Hitable> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(429);
     let mut rng = thread_rng();
     let mut rand = || rng.gen::<f32>();
@@ -559,5 +570,28 @@ pub fn rttnw_final_scene() -> Vec<Box<Hitable>> {
         .shift(-100.0, 270.0, 395.0)
         .push_into_list_of_boxed_hitables(&mut list);
 
-    list
+    Arc::new(BVHNode::new(list))
+}
+
+pub fn rttnw_final_scene() -> Scene {
+    let nx: i32 = 400;
+    let ny: i32 = 400;
+    let ns: i32 = 40;
+    let cam = Camera::new(CameraOpts {
+        lookfrom: Vec3::new(478.0, 278.0, -600.0),
+        lookat: Vec3::new(278.0, 278.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aspect: nx as f32 / ny as f32,
+        focus_dist: 10.0,
+        aperture: 0.0,
+        vfow: 40.0,
+    });
+
+    Scene {
+        nx,
+        ny,
+        ns,
+        cam,
+        world: rttnw_final_world(),
+    }
 }

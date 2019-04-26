@@ -12,35 +12,17 @@ mod texture;
 mod utils;
 mod vec3;
 
-use camera::{Camera, CameraOpts};
-use geometry::bvh::BVHNode;
-use hitable::Hitable;
 use image::png::PNGEncoder;
-use render::{render, Scene};
-use scene::rttnw_final_scene;
+use render::render;
+use scene::{rttnw_final_scene, Scene};
 use std::io;
 use std::io::BufWriter;
-use std::sync::Arc;
 use std::thread;
-use vec3::Vec3;
 
 fn main() {
-    let nx: i32 = 400;
-    let ny: i32 = 400;
-    let ns: i32 = 40;
+    let scene = rttnw_final_scene();
+    let Scene { nx, ny, .. } = scene;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
-
-    let world = Arc::new(BVHNode::new(rttnw_final_scene()));
-
-    let cam = Camera::new(CameraOpts {
-        lookfrom: Vec3::new(478.0, 278.0, -600.0),
-        lookat: Vec3::new(278.0, 278.0, 0.0),
-        vup: Vec3::new(0.0, 1.0, 0.0),
-        aspect: nx as f32 / ny as f32,
-        focus_dist: 10.0,
-        aperture: 0.0,
-        vfow: 40.0,
-    });
 
     let thread_count = 8;
     let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> =
@@ -49,18 +31,8 @@ fn main() {
     let mut starty = ny - y_section_size;
     let mut endy = ny;
     for _render_thread_num in 0..thread_count {
-        let thread_world = world.clone();
-        let render_thread = thread::spawn(move || {
-            render::<Arc<Hitable>>(Scene {
-                nx,
-                ny,
-                ns,
-                starty,
-                endy,
-                cam: &cam,
-                hitable: thread_world,
-            })
-        });
+        let thread_scene = scene.clone();
+        let render_thread = thread::spawn(move || render(thread_scene, starty, endy));
         render_threads.push(render_thread);
         endy = starty;
         starty -= y_section_size;
