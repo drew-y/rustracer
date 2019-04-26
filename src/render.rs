@@ -14,20 +14,22 @@ fn sky_background(r: &Ray) -> Vec3 {
 }
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
-    if let Some(rec) = world.hit(r, 0.001, MAX) {
-        let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
-        if depth >= 50 {
-            return emitted;
-        }
-        if let Some((attenuation, scattered)) = rec.material.scatter(r, &rec) {
-            emitted + attenuation * color(&scattered, world, depth + 1)
-        } else {
-            emitted
-        }
-    } else {
-        Vec3::new(0.0, 0.0, 0.0) // Black background
-                                 // sky_background(r)
+    let rec = match world.hit(r, 0.001, MAX) {
+        Some(rec) => rec,
+        _ => return Vec3::new(0.0, 0.0, 0.0),
+    };
+
+    let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
+    if depth >= 50 {
+        return emitted;
     }
+
+    let (attenuation, scattered) = match rec.material.scatter(r, &rec) {
+        Some((attenuation, scattered)) => (attenuation, scattered),
+        _ => return emitted,
+    };
+
+    emitted + attenuation * color(&scattered, world, depth + 1)
 }
 
 pub struct Scene<'a> {
