@@ -16,7 +16,7 @@ fn sky_background(r: &Ray) -> Vec3 {
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     let rec = match world.hit(r, 0.001, MAX) {
         Some(rec) => rec,
-        _ => return Vec3::new(0.0, 0.0, 0.0),
+        None => return Vec3::new(0.0, 0.0, 0.0),
     };
 
     let emitted = rec.material.emitted(rec.u, rec.v, rec.p);
@@ -26,7 +26,7 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
 
     let (attenuation, scattered) = match rec.material.scatter(r, &rec) {
         Some((attenuation, scattered)) => (attenuation, scattered),
-        _ => return emitted,
+        None => return emitted,
     };
 
     emitted + attenuation * color(&scattered, world, depth + 1)
