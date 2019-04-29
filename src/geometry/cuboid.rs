@@ -1,5 +1,5 @@
 use super::super::{
-    aabb::AABB,
+    bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     material::Material,
     ray::Ray,
@@ -93,7 +93,7 @@ impl Hitable for Cuboid {
         self.rects.hit(r, t_min, t_max)
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         self.rects.bounding_box()
     }
 }

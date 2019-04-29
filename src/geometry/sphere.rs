@@ -1,5 +1,5 @@
 use super::super::{
-    aabb::AABB,
+    bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     material::Material,
     ray::Ray,
@@ -61,8 +61,8 @@ impl Hitable for Sphere {
         None
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
-        Some(AABB {
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox {
             min: self.center - Vec3::new(self.radius, self.radius, self.radius),
             max: self.center + Vec3::new(self.radius, self.radius, self.radius),
         })
@@ -74,7 +74,7 @@ impl Hitable for Box<Sphere> {
         self.deref().hit(r, t_min, t_max)
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         self.deref().bounding_box()
     }
 }

@@ -1,5 +1,5 @@
 use super::super::{
-    aabb::AABB,
+    bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     ray::Ray,
 };
@@ -10,7 +10,7 @@ use std::cmp::Ordering;
 pub struct BVHNode {
     pub left: Option<Box<Hitable>>,
     pub right: Option<Box<Hitable>>,
-    pub bbox: Option<AABB>,
+    pub bbox: Option<BoundingBox>,
 }
 
 impl BVHNode {
@@ -42,9 +42,9 @@ impl BVHNode {
             let box_left = left.bounding_box();
             let box_right = right.bounding_box();
 
-            let mut bbox: Option<AABB> = None;
+            let mut bbox: Option<BoundingBox> = None;
             if let (Some(hit_left), Some(hit_right)) = (box_left, box_right) {
-                bbox = Some(AABB::surrounding_box(&hit_left, &hit_right));
+                bbox = Some(BoundingBox::surrounding_box(&hit_left, &hit_right));
             };
 
             return BVHNode {
@@ -60,9 +60,9 @@ impl BVHNode {
         let box_left = left.bounding_box();
         let box_right = right.bounding_box();
 
-        let mut bbox: Option<AABB> = None;
+        let mut bbox: Option<BoundingBox> = None;
         if let (Some(hit_left), Some(hit_right)) = (box_left, box_right) {
-            bbox = Some(AABB::surrounding_box(&hit_left, &hit_right));
+            bbox = Some(BoundingBox::surrounding_box(&hit_left, &hit_right));
         };
 
         BVHNode {
@@ -139,7 +139,7 @@ impl Hitable for BVHNode {
         }
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         self.bbox
     }
 }

@@ -2,13 +2,13 @@ use super::ray::Ray;
 use super::vec3::Vec3;
 
 #[derive(Copy, Clone, Debug)]
-pub struct AABB {
+pub struct BoundingBox {
     pub min: Vec3,
     pub max: Vec3,
 }
 
-impl AABB {
-    pub fn surrounding_box(bbox0: &AABB, bbox1: &AABB) -> AABB {
+impl BoundingBox {
+    pub fn surrounding_box(bbox0: &BoundingBox, bbox1: &BoundingBox) -> BoundingBox {
         let min = Vec3::new(
             bbox0.min.x.min(bbox1.min.x),
             bbox0.min.y.min(bbox1.min.y),
@@ -21,7 +21,7 @@ impl AABB {
             bbox0.max.z.max(bbox1.max.z),
         );
 
-        AABB { min, max }
+        BoundingBox { min, max }
     }
 
     /// If we hit returns a tuple of (tmin, tmax)

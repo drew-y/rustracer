@@ -1,4 +1,4 @@
-mod aabb;
+mod bounding_box;
 mod camera;
 mod geometry;
 mod hitable;

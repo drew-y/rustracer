@@ -1,5 +1,5 @@
 use super::super::{
-    aabb::AABB,
+    bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     ray::Ray,
     vec3::Vec3,
@@ -19,7 +19,7 @@ impl<T: Hitable> Hitable for FlipNormals<T> {
         })
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         self.hitable.bounding_box()
     }
 }
@@ -52,11 +52,11 @@ impl<T: Hitable> Hitable for Shift<T> {
         }
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
-        if let Some(original_aabb) = self.hitable.bounding_box() {
-            Some(AABB {
-                min: original_aabb.min + self.offset,
-                max: original_aabb.max + self.offset,
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        if let Some(original_bounding_box) = self.hitable.bounding_box() {
+            Some(BoundingBox {
+                min: original_bounding_box.min + self.offset,
+                max: original_bounding_box.max + self.offset,
             })
         } else {
             None
@@ -70,11 +70,11 @@ pub struct YRotation<T: Hitable> {
     hitable: T,
     sin_theta: f32,
     cos_theta: f32,
-    bbox: Option<AABB>,
+    bbox: Option<BoundingBox>,
 }
 
 impl<T: Hitable> YRotation<T> {
-    fn gen_bbox(hitable_bbox: AABB, cos_theta: f32, sin_theta: f32) -> AABB {
+    fn gen_bbox(hitable_bbox: BoundingBox, cos_theta: f32, sin_theta: f32) -> BoundingBox {
         let mut min = Vec3::new(F32MAX, F32MAX, F32MAX);
         let mut max = Vec3::new(-F32MAX, -F32MAX, -F32MAX);
         for i in 0..2 {
@@ -99,7 +99,7 @@ impl<T: Hitable> YRotation<T> {
                 }
             }
         }
-        AABB { min, max }
+        BoundingBox { min, max }
     }
 
     /// Rotate a hitable about the y axis by angle in degrees
@@ -142,7 +142,7 @@ impl<T: Hitable> Hitable for YRotation<T> {
         Some(HitRecord { p, normal, ..rec })
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         self.bbox
     }
 }

@@ -1,5 +1,5 @@
 use super::super::{
-    aabb::AABB,
+    bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     material::Material,
     ray::Ray,
@@ -39,8 +39,8 @@ impl Hitable for XYRect {
         })
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
-        Some(AABB {
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox {
             min: Vec3::new(self.x0, self.y0, self.k - 0.0001),
             max: Vec3::new(self.x1, self.y1, self.k + 0.0001),
         })
@@ -81,8 +81,8 @@ impl Hitable for XZRect {
         })
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
-        Some(AABB {
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox {
             min: Vec3::new(self.x0, self.k - 0.0001, self.z0),
             max: Vec3::new(self.x1, self.k + 0.0001, self.z1),
         })
@@ -125,8 +125,8 @@ impl Hitable for YZRect {
         })
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
-        Some(AABB {
+    fn bounding_box(&self) -> Option<BoundingBox> {
+        Some(BoundingBox {
             min: Vec3::new(self.k - 0.0001, self.y0, self.z0),
             max: Vec3::new(self.k + 0.0001, self.y1, self.z1),
         })

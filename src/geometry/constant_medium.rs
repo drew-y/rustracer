@@ -1,5 +1,5 @@
 use super::super::{
-    aabb::AABB,
+    bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     material::Material,
     ray::Ray,
@@ -49,7 +49,7 @@ impl<T: Hitable> Hitable for ConstantMedium<T> {
         }
     }
 
-    fn bounding_box(&self) -> Option<AABB> {
+    fn bounding_box(&self) -> Option<BoundingBox> {
         self.boundry.bounding_box()
     }
 }
