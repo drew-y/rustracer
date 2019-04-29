@@ -1,9 +1,4 @@
-use super::super::{
-    bounding_box::BoundingBox,
-    hitable::{HitRecord, Hitable},
-    ray::Ray,
-    vec3::Vec3,
-};
+use super::super::tracer::*;
 use std::f32::{consts::PI, MAX as F32MAX};
 
 pub struct FlipNormals<T: Hitable> {

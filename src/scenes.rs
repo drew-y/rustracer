@@ -1,21 +1,7 @@
-use super::{
-    camera::{Camera, CameraOpts},
-    geometry::{
-        bvh::BVHNode,
-        constant_medium::ConstantMedium,
-        cuboid::Cuboid,
-        rect::{XYRect, XZRect, YZRect},
-        sphere::Sphere,
-        translation::Translation,
-    },
-    hitable::Hitable,
-    material::{
-        self, dielectric, diffuse_light, isotropic, lambertion, lambertion_with_image,
-        Material::{Lambertion, Metal},
-    },
-    texture::{CheckerTexture, ConstantTexture, NoiseTexture, Texture},
-    vec3::Vec3,
-};
+use super::geometry::*;
+use super::material::*;
+use super::texture::*;
+use super::tracer::*;
 use rand::prelude::*;
 use std::sync::Arc;
 
@@ -79,7 +65,7 @@ fn gen_random_spheres() -> Vec<Box<Hitable>> {
             Sphere {
                 center,
                 radius: 0.2,
-                material: Metal {
+                material: Material::Metal {
                     albedo: Vec3::new(
                         0.5 * (1.0 + rnd()),
                         0.5 * (1.0 + rnd()),
@@ -117,7 +103,7 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
-        material: Lambertion {
+        material: Material::Lambertion {
             albedo: floor_texture,
         },
     }
@@ -127,21 +113,21 @@ pub fn random_scene() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, 1.0, 0.0),
         radius: 1.0,
-        material: material::dielectric(1.5),
+        material: dielectric(1.5),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     Sphere {
         center: Vec3::new(-4.0, 1.0, 0.0),
         radius: 1.0,
-        material: material::lambertion(0.4, 0.2, 0.1),
+        material: lambertion(0.4, 0.2, 0.1),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     Sphere {
         center: Vec3::new(4.0, 1.0, 0.0),
         radius: 1.0,
-        material: material::metal(Vec3::new(0.7, 0.6, 0.5), 0.0),
+        material: metal(Vec3::new(0.7, 0.6, 0.5), 0.0),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -160,7 +146,7 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
-        material: Lambertion {
+        material: Material::Lambertion {
             albedo: floor_texture,
         },
     }
@@ -169,14 +155,14 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, 2.0, 0.0),
         radius: 2.0,
-        material: material::lambertion(0.4, 0.2, 0.1),
+        material: lambertion(0.4, 0.2, 0.1),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     Sphere {
         center: Vec3::new(0.0, 7.0, 0.0),
         radius: 2.0,
-        material: material::diffuse_light(4.0, 4.0, 4.0),
+        material: diffuse_light(4.0, 4.0, 4.0),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -186,7 +172,7 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
         y0: 1.0,
         y1: 3.0,
         k: -2.0,
-        material: material::diffuse_light(4.0, 4.0, 4.0),
+        material: diffuse_light(4.0, 4.0, 4.0),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -196,10 +182,10 @@ pub fn simple_light() -> Vec<Box<Hitable>> {
 pub fn cornell_box() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
 
-    let green = material::lambertion(0.12, 0.45, 0.15);
-    let red = material::lambertion(0.65, 0.05, 0.05);
-    let light = material::diffuse_light(15.0, 15.0, 15.0);
-    let white = material::lambertion(0.73, 0.73, 0.73);
+    let green = lambertion(0.12, 0.45, 0.15);
+    let red = lambertion(0.65, 0.05, 0.05);
+    let light = diffuse_light(15.0, 15.0, 15.0);
+    let white = lambertion(0.73, 0.73, 0.73);
 
     YZRect {
         y0: 0.0,
@@ -286,7 +272,7 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(350.0, 400.0, 295.0),
         radius: 50.0,
-        material: material::dielectric(1.5),
+        material: dielectric(1.5),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -296,10 +282,10 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
 pub fn cornell_smoke() -> Vec<Box<Hitable>> {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
 
-    let green = material::lambertion(0.12, 0.45, 0.15);
-    let red = material::lambertion(0.65, 0.05, 0.05);
-    let light = material::diffuse_light(15.0, 15.0, 15.0);
-    let white = material::lambertion(0.73, 0.73, 0.73);
+    let green = lambertion(0.12, 0.45, 0.15);
+    let red = lambertion(0.65, 0.05, 0.05);
+    let light = diffuse_light(15.0, 15.0, 15.0);
+    let white = lambertion(0.73, 0.73, 0.73);
 
     YZRect {
         y0: 0.0,
@@ -398,7 +384,7 @@ pub fn cornell_smoke() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(350.0, 400.0, 295.0),
         radius: 50.0,
-        material: material::dielectric(1.5),
+        material: dielectric(1.5),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -412,7 +398,7 @@ pub fn two_perlin_spheres() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, -1000.0, 0.0),
         radius: 1000.0,
-        material: Lambertion {
+        material: Material::Lambertion {
             albedo: texture.box_clone(),
         },
     }
@@ -421,7 +407,7 @@ pub fn two_perlin_spheres() -> Vec<Box<Hitable>> {
     Sphere {
         center: Vec3::new(0.0, 2.0, 0.0),
         radius: 2.0,
-        material: Lambertion {
+        material: Material::Lambertion {
             albedo: texture.box_clone(),
         },
     }
@@ -533,21 +519,21 @@ fn rttnw_final_world() -> Arc<Hitable> {
     Sphere {
         center: Vec3::new(260.0, 150.0, 45.0),
         radius: 50.0,
-        material: material::dielectric(1.5),
+        material: dielectric(1.5),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     Sphere {
         center: Vec3::new(0.0, 150.0, 145.0),
         radius: 50.0,
-        material: material::metal(Vec3::new(0.8, 0.8, 0.9), 0.7),
+        material: metal(Vec3::new(0.8, 0.8, 0.9), 0.7),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     let boundry1 = Sphere {
         center: Vec3::new(360.0, 150.0, 145.0),
         radius: 50.0,
-        material: material::dielectric(1.5),
+        material: dielectric(1.5),
     };
 
     ConstantMedium {
@@ -561,7 +547,7 @@ fn rttnw_final_world() -> Arc<Hitable> {
     let boundry2 = Sphere {
         center: Vec3::new(0.0, 0.0, 0.0),
         radius: 5000.0,
-        material: material::dielectric(1.5),
+        material: dielectric(1.5),
     };
 
     ConstantMedium {
@@ -581,7 +567,7 @@ fn rttnw_final_world() -> Arc<Hitable> {
     Sphere {
         center: Vec3::new(220.0, 280.0, 300.0),
         radius: 80.0,
-        material: Lambertion {
+        material: Material::Lambertion {
             albedo: NoiseTexture::new(0.1).box_clone(),
         },
     }

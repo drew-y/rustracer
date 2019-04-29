@@ -1,3 +1,6 @@
+use super::{camera::Camera, hitable::Hitable};
+use std::sync::Arc;
+
 #[derive(Clone)]
 pub struct Scene {
     pub nx: i32,

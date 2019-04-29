@@ -1,12 +1,5 @@
-use super::super::{
-    bounding_box::BoundingBox,
-    hitable::{HitRecord, Hitable},
-    material::Material,
-    ray::Ray,
-    vec3::Vec3,
-};
+use super::super::{material::Material, tracer::*};
 use super::{
-    bvh::BVHNode,
     rect::{XYRect, XZRect, YZRect},
     translation::Translation,
 };

@@ -1,4 +1,5 @@
-use super::{perlin::Perlin, vec3::Vec3};
+use super::perlin::Perlin;
+use super::tracer::Vec3;
 use std::ops::Deref;
 use std::sync::Arc;
 

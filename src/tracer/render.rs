@@ -5,6 +5,11 @@ use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::MAX;
 
+use image::png::PNGEncoder;
+use std::io;
+use std::io::BufWriter;
+use std::thread;
+
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     let rec = match world.hit(r, 0.001, MAX) {
         Some(rec) => rec,
@@ -24,7 +29,7 @@ fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     emitted + attenuation * color(&scattered, world, depth + 1)
 }
 
-pub fn render(scene: Scene, starty: i32, endy: i32) -> Vec<u8> {
+fn render_section(scene: Scene, starty: i32, endy: i32) -> Vec<u8> {
     let mut file: Vec<u8> = Vec::with_capacity((endy - starty) as usize * scene.nx as usize * 3);
     let Scene {
         ns,
@@ -55,4 +60,38 @@ pub fn render(scene: Scene, starty: i32, endy: i32) -> Vec<u8> {
         }
     }
     file
+}
+
+pub fn render(scene: Scene) {
+    let Scene { nx, ny, .. } = scene;
+    let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
+
+    let thread_count = 8;
+    let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> =
+        Vec::with_capacity(thread_count as usize);
+    let y_section_size = ny / thread_count;
+    let mut starty = ny - y_section_size;
+    let mut endy = ny;
+
+    for _render_thread_num in 0..thread_count {
+        let thread_scene = scene.clone();
+        let render_thread = thread::spawn(move || render_section(thread_scene, starty, endy));
+        render_threads.push(render_thread);
+        endy = starty;
+        starty -= y_section_size;
+    }
+
+    for render_thread in render_threads {
+        file.extend(render_thread.join().unwrap());
+    }
+
+    let w = BufWriter::new(io::stdout());
+    let encoder = PNGEncoder::new(w);
+    match encoder.encode(&file, nx as u32, ny as u32, image::ColorType::RGB(8)) {
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            std::process::exit(1);
+        }
+        _ => {}
+    }
 }

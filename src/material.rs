@@ -1,8 +1,6 @@
-use super::hitable::HitRecord;
-use super::ray::Ray;
 use super::texture::{ConstantTexture, ImageTexture, Texture};
+use super::tracer::*;
 use super::utils::read_image;
-use super::vec3::Vec3;
 use rand::prelude::*;
 
 #[derive(Clone)]

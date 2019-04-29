@@ -1,4 +1,4 @@
-use super::vec3::Vec3;
+use super::tracer::Vec3;
 use rand::{prelude::*, seq::SliceRandom};
 
 #[derive(Copy, Clone)]

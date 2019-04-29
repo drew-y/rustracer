@@ -1,5 +1,5 @@
+use super::super::material::Material;
 use super::bounding_box::BoundingBox;
-use super::material::Material;
 use super::ray::Ray;
 use super::vec3::Vec3;
 use std::ops::Deref;

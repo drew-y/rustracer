@@ -1,10 +1,4 @@
-use super::super::{
-    bounding_box::BoundingBox,
-    hitable::{HitRecord, Hitable},
-    material::Material,
-    ray::Ray,
-    vec3::Vec3,
-};
+use super::super::{material::Material, tracer::*};
 use super::translation::Translation;
 use std::f32::consts::PI;
 use std::ops::Deref;

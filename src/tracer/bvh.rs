@@ -1,9 +1,9 @@
-use super::super::{
+use super::super::geometry::translation::Translation;
+use super::{
     bounding_box::BoundingBox,
     hitable::{HitRecord, Hitable},
     ray::Ray,
 };
-use super::translation::Translation;
 use rand::prelude::*;
 use std::cmp::Ordering;
 
