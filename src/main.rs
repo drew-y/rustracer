@@ -14,13 +14,13 @@ mod vec3;
 
 use image::png::PNGEncoder;
 use render::render;
-use scene::{rttnw_final_scene, Scene};
+use scene::{earth, Scene};
 use std::io;
 use std::io::BufWriter;
 use std::thread;
 
 fn main() {
-    let scene = rttnw_final_scene();
+    let scene = earth();
     let Scene { nx, ny, .. } = scene;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
