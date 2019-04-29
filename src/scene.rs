@@ -19,15 +19,6 @@ use super::{
 use rand::prelude::*;
 use std::sync::Arc;
 
-#[derive(Clone)]
-pub struct Scene {
-    pub nx: i32,
-    pub ny: i32,
-    pub ns: i32,
-    pub cam: Camera,
-    pub world: Arc<Hitable>,
-}
-
 fn gen_coords() -> [(i32, i32); 484] {
     let mut coords: [(i32, i32); 484] = [(0, 0); 484];
     let mut index = 0;
