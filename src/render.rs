@@ -5,13 +5,6 @@ use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::MAX;
 
-#[allow(dead_code)]
-fn sky_background(r: &Ray) -> Vec3 {
-    let unit_direction = &r.direction.unit_vector();
-    let t = 0.5 * (unit_direction.y + 1.0);
-    (1.0 - t) * Vec3::new(1.0, 1.0, 1.0) + t * Vec3::new(0.5, 0.7, 1.0)
-}
-
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
     let rec = match world.hit(r, 0.001, MAX) {
         Some(rec) => rec,
