@@ -1,9 +1,9 @@
 use super::{
     camera::{Camera, CameraOpts},
     geometry::{
-        box_geo::BoxGeo,
         bvh::BVHNode,
         constant_medium::ConstantMedium,
+        cuboid::Cuboid,
         rect::{XYRect, XZRect, YZRect},
         sphere::Sphere,
         translation::Translation,
@@ -273,7 +273,7 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
     .flip_normals()
     .push_into_list_of_boxed_hitables(&mut list);
 
-    BoxGeo::new(
+    Cuboid::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 165.0, 165.0),
         white.clone(),
@@ -282,7 +282,7 @@ pub fn cornell_box() -> Vec<Box<Hitable>> {
     .shift(130.0, 0.0, 65.0)
     .push_into_list_of_boxed_hitables(&mut list);
 
-    BoxGeo::new(
+    Cuboid::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 330.0, 165.0),
         white.clone(),
@@ -373,7 +373,7 @@ pub fn cornell_smoke() -> Vec<Box<Hitable>> {
     .flip_normals()
     .push_into_list_of_boxed_hitables(&mut list);
 
-    let b1 = BoxGeo::new(
+    let b1 = Cuboid::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 165.0, 165.0),
         white.clone(),
@@ -381,7 +381,7 @@ pub fn cornell_smoke() -> Vec<Box<Hitable>> {
     .rotate_y(-18.0)
     .shift(130.0, 0.0, 65.0);
 
-    let b2 = BoxGeo::new(
+    let b2 = Cuboid::new(
         Vec3::new(0.0, 0.0, 0.0),
         Vec3::new(165.0, 330.0, 165.0),
         white.clone(),
@@ -520,7 +520,7 @@ fn rttnw_final_world() -> Arc<Hitable> {
             let x1 = x0 + w;
             let y1 = 100.0 * rand() + 0.01;
             let z1 = z0 + w;
-            BoxGeo::new(
+            Cuboid::new(
                 Vec3::new(x0 as f32, y0 as f32, z0 as f32),
                 Vec3::new(x1 as f32, y1, z1 as f32),
                 ground.clone(),

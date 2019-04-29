@@ -11,12 +11,12 @@ use super::{
     translation::Translation,
 };
 
-pub struct BoxGeo {
+pub struct Cuboid {
     rects: BVHNode,
 }
 
-impl BoxGeo {
-    pub fn new(pmin: Vec3, pmax: Vec3, material: Material) -> BoxGeo {
+impl Cuboid {
+    pub fn new(pmin: Vec3, pmax: Vec3, material: Material) -> Cuboid {
         let mut list: Vec<Box<Hitable>> = Vec::with_capacity(6);
 
         XYRect {
@@ -82,13 +82,13 @@ impl BoxGeo {
         .flip_normals()
         .push_into_list_of_boxed_hitables(&mut list);
 
-        BoxGeo {
+        Cuboid {
             rects: BVHNode::new(list),
         }
     }
 }
 
-impl Hitable for BoxGeo {
+impl Hitable for Cuboid {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         self.rects.hit(r, t_min, t_max)
     }
@@ -98,4 +98,4 @@ impl Hitable for BoxGeo {
     }
 }
 
-impl Translation for BoxGeo {}
+impl Translation for Cuboid {}
