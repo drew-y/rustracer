@@ -13,5 +13,5 @@ use tracer::render;
 
 fn main() {
     let scene = earth();
-    render(scene);
+    render(scene, "test.png");
 }

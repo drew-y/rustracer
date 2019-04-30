@@ -5,9 +5,7 @@ use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::MAX;
 
-use image::png::PNGEncoder;
-use std::io;
-use std::io::BufWriter;
+use image;
 use std::thread;
 
 fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
@@ -62,7 +60,7 @@ fn render_section(scene: Scene, starty: i32, endy: i32) -> Vec<u8> {
     file
 }
 
-pub fn render(scene: Scene) {
+pub fn render(scene: Scene, path: &str) {
     let Scene { nx, ny, .. } = scene;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
@@ -85,9 +83,7 @@ pub fn render(scene: Scene) {
         file.extend(render_thread.join().unwrap());
     }
 
-    let w = BufWriter::new(io::stdout());
-    let encoder = PNGEncoder::new(w);
-    match encoder.encode(&file, nx as u32, ny as u32, image::ColorType::RGB(8)) {
+    match image::save_buffer(path, &file, nx as u32, ny as u32, image::ColorType::RGB(8)) {
         Err(e) => {
             eprintln!("Error: {}", e);
             std::process::exit(1);
