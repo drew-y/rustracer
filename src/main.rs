@@ -1,3 +1,5 @@
+#[allow(dead_code)]
+mod animation;
 mod geometry;
 mod material;
 #[allow(dead_code)]
