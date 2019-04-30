@@ -1,8 +1,35 @@
-use super::tracer::Vec3;
+use super::texture::Texture;
+use crate::tracer::Vec3;
 use rand::{prelude::*, seq::SliceRandom};
+use std::ops::Deref;
+
+#[derive(Clone)]
+pub struct NoiseTexture {
+    scale: f32,
+    noise: Perlin,
+}
+
+impl NoiseTexture {
+    pub fn new(scale: f32) -> NoiseTexture {
+        NoiseTexture {
+            scale,
+            noise: Perlin::new(),
+        }
+    }
+}
+
+impl Texture for NoiseTexture {
+    fn value(&self, _u: f32, _v: f32, p: Vec3) -> Vec3 {
+        Vec3::new(1.0, 1.0, 1.0) * 3.0 * self.noise.turb(&(self.scale * p), 7).sin()
+    }
+
+    fn box_clone(&self) -> Box<Texture> {
+        Box::new(self.deref().clone())
+    }
+}
 
 #[derive(Copy, Clone)]
-pub struct Perlin {
+struct Perlin {
     rand_vec3: [Vec3; 256],
     x: [i32; 256],
     y: [i32; 256],
@@ -10,7 +37,7 @@ pub struct Perlin {
 }
 
 impl Perlin {
-    pub fn new() -> Perlin {
+    fn new() -> Perlin {
         Perlin {
             rand_vec3: Self::gen_rand_vec3_list(),
             x: Self::gen_rand_int_list(),
@@ -19,7 +46,7 @@ impl Perlin {
         }
     }
 
-    pub fn noise(&self, p: &Vec3) -> f32 {
+    fn noise(&self, p: &Vec3) -> f32 {
         let u = p.x - p.x.floor();
         let v = p.y - p.y.floor();
         let w = p.z - p.z.floor();
@@ -61,7 +88,7 @@ impl Perlin {
         accum
     }
 
-    pub fn turb(&self, p: &Vec3, depth: i8) -> f32 {
+    fn turb(&self, p: &Vec3, depth: i8) -> f32 {
         let mut accum = 0.0;
         let mut temp_p = *p;
         let mut weight = 1.0;

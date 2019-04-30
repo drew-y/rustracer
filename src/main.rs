@@ -1,6 +1,5 @@
 mod geometry;
 mod material;
-mod perlin;
 #[allow(dead_code)]
 mod scenes;
 mod texture;
