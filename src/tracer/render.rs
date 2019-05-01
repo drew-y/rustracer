@@ -60,7 +60,7 @@ fn render_section(scene: Scene, starty: i32, endy: i32) -> Vec<u8> {
     file
 }
 
-pub fn render(scene: Scene, path: &str) {
+pub fn render(scene: Scene, path: String) {
     let Scene { nx, ny, .. } = scene;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 

@@ -2,36 +2,32 @@ use crate::tracer::Vec3;
 
 #[derive(Copy, Clone)]
 pub struct Orbit3D {
-    center: Vec3,
+    pub center: Vec3,
     radius: f32,
-    /// Orbital inclination in degrees
+    /// Orbital inclination in radians
     inclination: f32,
-    start_azimuth: f32,
     /// Velocity in degrees per second
     velocity: f32,
 }
 
 impl Orbit3D {
     pub fn new(start_point: Vec3, center: Vec3, velocity: f32) -> Orbit3D {
-        let origin = start_point - center;
-        let radius = origin.length();
-        let inclination = (origin.z / radius).acos().to_degrees();
-        let start_azimuth = origin.x.atan2(origin.y).to_degrees();
+        let rise = start_point.y - center.y;
+        let run = ((start_point.x * start_point.x) + (start_point.z * start_point.z)).sqrt();
+        let inclination = rise.atan2(run);
         Orbit3D {
             center,
-            radius,
+            radius: (start_point - center).length(),
             inclination,
-            start_azimuth,
             velocity,
         }
     }
 
     /// Find the point at azimut in DEGREES
     pub fn point_at_azimuth(&self, azimuth: f32) -> Vec3 {
-        let sin_inclination = self.inclination.to_radians().sin();
-        let x = self.radius * sin_inclination * azimuth.to_radians().cos();
-        let y = self.radius * sin_inclination * azimuth.to_radians().sin();
-        let z = self.radius * self.inclination.to_radians().cos();
+        let x = azimuth.to_radians().cos() * self.radius;
+        let z = azimuth.to_radians().sin() * self.radius;
+        let y = (x / self.inclination.cos()) * self.inclination.sin();
         Vec3::new(x, y, z) + self.center
     }
 

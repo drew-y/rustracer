@@ -1,5 +1,7 @@
 #[allow(dead_code)]
 mod animation;
+#[allow(dead_code)]
+mod animations;
 mod geometry;
 mod material;
 #[allow(dead_code)]
@@ -8,10 +10,8 @@ mod texture;
 mod tracer;
 mod utils;
 
-use scenes::earth;
-use tracer::render;
+use animations::moon_orbits_earth;
 
 fn main() {
-    let scene = earth();
-    render(scene, "test.png");
+    moon_orbits_earth();
 }
