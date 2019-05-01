@@ -47,8 +47,8 @@ fn earth(time: f32) -> Scene {
 
     let world = Arc::new(BVHNode::new(list));
 
-    let nx: i32 = 500;
-    let ny: i32 = 500;
+    let nx: i32 = 600;
+    let ny: i32 = 600;
     let ns: i32 = 1000;
     let cam = Camera::new(CameraOpts {
         lookfrom: Vec3::new(0.0, 0.0, 15.0),
