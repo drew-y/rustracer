@@ -1,19 +1,20 @@
 use super::texture::Texture;
 use crate::tracer::Vec3;
+use lazy_static;
 use rand::{prelude::*, seq::SliceRandom};
 use std::ops::Deref;
 
 #[derive(Clone)]
 pub struct NoiseTexture {
     scale: f32,
-    noise: Perlin,
+    noise: &'static Perlin,
 }
 
 impl NoiseTexture {
     pub fn new(scale: f32) -> NoiseTexture {
         NoiseTexture {
             scale,
-            noise: Perlin::new(),
+            noise: &PERLIN,
         }
     }
 }
@@ -127,4 +128,8 @@ impl Perlin {
         Self::permute(&mut p);
         p
     }
+}
+
+lazy_static! {
+    static ref PERLIN: Perlin = Perlin::new();
 }
