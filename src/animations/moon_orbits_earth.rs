@@ -76,13 +76,9 @@ fn earth(time: f32) -> Scene {
 }
 
 pub fn moon_orbits_earth() {
-    let fps = 60;
-    let duration = 10;
-    let frames = fps * duration;
-
-    for frame in 1..=frames {
-        let time = frame as f32 / fps as f32;
-        let scene = earth(time);
-        render(scene, format!("frame{}.png", frame));
-    }
+    render_animation(AnimatedScene {
+        fps: 60,
+        duration: 6,
+        scene_fn: &earth,
+    });
 }

@@ -1,6 +1,6 @@
 use super::hitable::Hitable;
 use super::ray::Ray;
-use super::scene::Scene;
+use super::scene::{AnimatedScene, Scene};
 use super::vec3::Vec3;
 use rand::prelude::*;
 use std::f32::MAX;
@@ -89,5 +89,13 @@ pub fn render(scene: Scene, path: String) {
             std::process::exit(1);
         }
         _ => {}
+    }
+}
+
+pub fn render_animation(scene: AnimatedScene) {
+    let frames = scene.fps * scene.duration;
+    for frame in 1..=frames {
+        let time = frame as f32 / scene.fps as f32;
+        render((scene.scene_fn)(time), format!("frame{}.png", frame));
     }
 }
