@@ -2,7 +2,13 @@ use crate::animation::*;
 use crate::geometry::*;
 use crate::material;
 use crate::tracer::*;
+use lazy_static;
 use std::sync::Arc;
+
+lazy_static! {
+    static ref EARTHMAP: material::Material = material::lambertion_with_image("../earthmap.jpg");
+    static ref MOONMAP: material::Material = material::lambertion_with_image("../moonmap.jpg");
+}
 
 fn earth(time: f32) -> Scene {
     let mut list: Vec<Box<Hitable>> = Vec::with_capacity(2);
@@ -19,7 +25,7 @@ fn earth(time: f32) -> Scene {
     Sphere {
         center: Vec3::new(0.0, 0.0, 0.0),
         radius: 3.5,
-        material: material::lambertion_with_image("../earthmap.jpg"),
+        material: EARTHMAP.clone(),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -41,7 +47,7 @@ fn earth(time: f32) -> Scene {
     Sphere {
         center: moon_orbit.point_at_time(time),
         radius: 0.6,
-        material: material::lambertion_with_image("../moonmap.jpg"),
+        material: MOONMAP.clone(),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
