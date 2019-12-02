@@ -60,15 +60,6 @@ impl Vec3 {
         self / self.length()
     }
 
-    /// Converts this Vec3 to a unit vector
-    pub fn make_unit_vector(mut self) -> Self {
-        let k = 1.0 / self.length();
-        self.x *= k;
-        self.y *= k;
-        self.z *= k;
-        self
-    }
-
     /// Field access by index 0: x, 1: y, 2: z
     pub fn index(&self, i: i32) -> f32 {
         match i {
@@ -291,5 +282,29 @@ impl ops::DivAssign<f32> for Vec3 {
         self.x *= k;
         self.y *= k;
         self.z *= k;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::utils::FloatCmp;
+
+    #[test]
+    fn mul_vec3_vec3() {
+        let v1 = Vec3::new(2.0, 1.0, 3.0);
+        let v2 = Vec3::new(2.0, 5.0, 4.0);
+        let result = v1 * v2;
+        result.x.assert_nearly_eq(4.0);
+        result.y.assert_nearly_eq(5.0);
+        result.z.assert_nearly_eq(12.0);
+    }
+
+    #[test]
+    fn vec3_to_unit_vector() {
+        let unit_vec = Vec3::new(3.4, 3.2, 5.3).unit_vector();
+        unit_vec.x.assert_nearly_eq(0.4813624);
+        unit_vec.y.assert_nearly_eq(0.45304698);
+        unit_vec.z.assert_nearly_eq(0.75035906);
     }
 }

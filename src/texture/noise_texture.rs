@@ -110,7 +110,7 @@ impl Perlin {
                 -1.0 + 2.0 * rng.gen::<f32>(),
                 -1.0 + 2.0 * rng.gen::<f32>(),
             )
-            .make_unit_vector();
+            .unit_vector();
         }
         p
     }
