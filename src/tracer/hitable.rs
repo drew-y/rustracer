@@ -11,6 +11,8 @@ pub trait Hitable: Sync + Send {
     fn bounding_box(&self) -> Option<BoundingBox>;
 }
 
+pub type BoxHitable = Box<dyn Hitable>;
+
 #[derive(Copy, Clone)]
 pub struct HitRecord<'a> {
     pub t: f32,
@@ -21,7 +23,7 @@ pub struct HitRecord<'a> {
     pub material: &'a Material,
 }
 
-impl Hitable for Arc<Hitable> {
+impl Hitable for Arc<dyn Hitable> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         self.deref().hit(r, t_min, t_max)
     }
@@ -31,7 +33,7 @@ impl Hitable for Arc<Hitable> {
     }
 }
 
-impl Hitable for Box<Hitable> {
+impl Hitable for Box<dyn Hitable> {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         self.deref().hit(r, t_min, t_max)
     }

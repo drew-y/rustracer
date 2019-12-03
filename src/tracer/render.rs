@@ -8,7 +8,7 @@ use std::f32::MAX;
 use image;
 use std::thread;
 
-fn color<T: Hitable>(r: &Ray, world: &T, depth: i32) -> Vec3 {
+fn color(r: &Ray, world: &impl Hitable, depth: i32) -> Vec3 {
     let rec = match world.hit(r, 0.001, MAX) {
         Some(rec) => rec,
         None => return Vec3::new(0.0, 0.0, 0.0),

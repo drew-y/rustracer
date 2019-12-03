@@ -1,19 +1,19 @@
-use super::texture::{ConstantTexture, ImageTexture, Texture};
+use super::texture::{BoxTexture, ConstantTexture, ImageTexture, Texture};
 use super::tracer::*;
 use super::utils::read_image;
 use rand::prelude::*;
 
 #[derive(Clone)]
 pub enum Material {
-    Lambertion { albedo: Box<Texture> },
+    Lambertion { albedo: BoxTexture },
     Metal { albedo: Vec3, fuzz: f32 },
     Dielectric { ref_idx: f32 },
-    DiffuseLight { emit: Box<Texture> },
-    Isotropic { albedo: Box<Texture> },
+    DiffuseLight { emit: BoxTexture },
+    Isotropic { albedo: BoxTexture },
 }
 
 impl Material {
-    fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
+    fn lambertion_scatter(_r: &Ray, rec: &HitRecord, albedo: &BoxTexture) -> Option<(Vec3, Ray)> {
         let target = rec.p + rec.normal + Vec3::random_in_unit_sphere();
         return Some((
             albedo.value(rec.u, rec.v, rec.p),
@@ -99,7 +99,7 @@ impl Material {
         reflection
     }
 
-    fn isotropic_scatter(_r: &Ray, rec: &HitRecord, albedo: &Box<Texture>) -> Option<(Vec3, Ray)> {
+    fn isotropic_scatter(_r: &Ray, rec: &HitRecord, albedo: &BoxTexture) -> Option<(Vec3, Ray)> {
         let scattered = Ray {
             origin: rec.p,
             direction: Vec3::random_in_unit_sphere(),

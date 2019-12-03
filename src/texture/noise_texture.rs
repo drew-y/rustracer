@@ -24,7 +24,7 @@ impl Texture for NoiseTexture {
         Vec3::new(1.0, 1.0, 1.0) * 3.0 * self.noise.turb(&(self.scale * p), 7).sin()
     }
 
-    fn box_clone(&self) -> Box<Texture> {
+    fn box_clone(&self) -> Box<dyn Texture> {
         Box::new(self.deref().clone())
     }
 }

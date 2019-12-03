@@ -1,20 +1,20 @@
 use super::super::geometry::translation::Translation;
 use super::{
     bounding_box::BoundingBox,
-    hitable::{HitRecord, Hitable},
+    hitable::{BoxHitable, HitRecord, Hitable},
     ray::Ray,
 };
 use rand::prelude::*;
 use std::cmp::Ordering;
 
 pub struct BVHNode {
-    pub left: Option<Box<Hitable>>,
-    pub right: Option<Box<Hitable>>,
+    pub left: Option<BoxHitable>,
+    pub right: Option<BoxHitable>,
     pub bbox: Option<BoundingBox>,
 }
 
 impl BVHNode {
-    pub fn new(l: Vec<Box<Hitable>>) -> BVHNode {
+    pub fn new(l: Vec<BoxHitable>) -> BVHNode {
         let mut list = l;
         let mut rng = thread_rng();
         let axis = (3.0 * rng.gen::<f32>()) as i32;
@@ -72,7 +72,7 @@ impl BVHNode {
         }
     }
 
-    fn box_x_compare(a: &Box<Hitable>, b: &Box<Hitable>) -> Ordering {
+    fn box_x_compare(a: &BoxHitable, b: &BoxHitable) -> Ordering {
         let box_left = a.bounding_box();
         let box_right = b.bounding_box();
         if let (Some(hit_left), Some(hit_right)) = (box_left, box_right) {
@@ -84,7 +84,7 @@ impl BVHNode {
         panic!("Error in BVH bounding box gen");
     }
 
-    fn box_y_compare(a: &Box<Hitable>, b: &Box<Hitable>) -> Ordering {
+    fn box_y_compare(a: &BoxHitable, b: &BoxHitable) -> Ordering {
         let box_left = a.bounding_box();
         let box_right = b.bounding_box();
         if let (Some(hit_left), Some(hit_right)) = (box_left, box_right) {
@@ -96,7 +96,7 @@ impl BVHNode {
         panic!("Error in BVH bounding box gen");
     }
 
-    fn box_z_compare(a: &Box<Hitable>, b: &Box<Hitable>) -> Ordering {
+    fn box_z_compare(a: &BoxHitable, b: &BoxHitable) -> Ordering {
         let box_left = a.bounding_box();
         let box_right = b.bounding_box();
         if let (Some(hit_left), Some(hit_right)) = (box_left, box_right) {

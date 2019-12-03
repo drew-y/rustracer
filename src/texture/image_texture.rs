@@ -22,7 +22,7 @@ impl Texture for ImageTexture {
         Vec3::new(r, g, b)
     }
 
-    fn box_clone(&self) -> Box<Texture> {
+    fn box_clone(&self) -> Box<dyn Texture> {
         Box::new(self.deref().clone())
     }
 }

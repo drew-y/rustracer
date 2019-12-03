@@ -7,7 +7,7 @@ pub struct Scene {
     pub ny: i32,
     pub ns: i32,
     pub cam: Camera,
-    pub world: Arc<Hitable>,
+    pub world: Arc<dyn Hitable>,
 }
 
 #[derive(Clone)]
@@ -15,5 +15,5 @@ pub struct AnimatedScene {
     pub fps: i32,
     pub duration: i32,
     /// A function that returns a scene when passed time in seconds
-    pub scene_fn: &'static Fn(f32) -> Scene,
+    pub scene_fn: &'static dyn Fn(f32) -> Scene,
 }

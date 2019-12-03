@@ -10,7 +10,7 @@ pub struct Cuboid {
 
 impl Cuboid {
     pub fn new(pmin: Vec3, pmax: Vec3, material: Material) -> Cuboid {
-        let mut list: Vec<Box<Hitable>> = Vec::with_capacity(6);
+        let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(6);
 
         XYRect {
             x0: pmin.x,

@@ -165,7 +165,7 @@ pub trait Translation: Hitable + Sized {
     }
 
     /// Push self into a list of boxed hitables (boxes self)
-    fn push_into_list_of_boxed_hitables<'a>(self, list: &mut Vec<Box<Hitable + 'a>>)
+    fn push_into_list_of_boxed_hitables<'a>(self, list: &mut Vec<Box<dyn Hitable + 'a>>)
     where
         Self: 'a,
     {

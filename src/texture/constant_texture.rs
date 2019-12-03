@@ -20,7 +20,7 @@ impl Texture for ConstantTexture {
         self.color
     }
 
-    fn box_clone(&self) -> Box<Texture> {
+    fn box_clone(&self) -> Box<dyn Texture> {
         Box::new(self.deref().clone())
     }
 }

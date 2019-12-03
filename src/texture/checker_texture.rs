@@ -4,8 +4,8 @@ use std::ops::Deref;
 
 #[derive(Clone)]
 pub struct CheckerTexture {
-    pub odd: Box<Texture>,
-    pub even: Box<Texture>,
+    pub odd: Box<dyn Texture>,
+    pub even: Box<dyn Texture>,
 }
 
 impl Texture for CheckerTexture {
@@ -18,7 +18,7 @@ impl Texture for CheckerTexture {
         }
     }
 
-    fn box_clone(&self) -> Box<Texture> {
+    fn box_clone(&self) -> Box<dyn Texture> {
         Box::new(self.deref().clone())
     }
 }
