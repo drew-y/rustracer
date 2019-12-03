@@ -5,8 +5,8 @@ use crate::tracer::*;
 use rand::prelude::*;
 use std::sync::Arc;
 
-fn rttnw_final_world() -> Arc<Hitable> {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(429);
+fn rttnw_final_world() -> Arc<dyn Hitable> {
+    let mut list: Vec<BoxHitable> = Vec::with_capacity(429);
     let mut rng = thread_rng();
     let mut rand = || rng.gen::<f32>();
     let white = material::lambertion(0.73, 0.73, 0.73);
@@ -99,7 +99,7 @@ fn rttnw_final_world() -> Arc<Hitable> {
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
-    let mut list2: Vec<Box<Hitable>> = Vec::with_capacity(429);
+    let mut list2: Vec<BoxHitable> = Vec::with_capacity(429);
     for _ in 0..1000 {
         Sphere {
             center: Vec3::new(165.0 * rand(), 165.0 * rand(), 165.0 * rand()),
@@ -117,7 +117,8 @@ fn rttnw_final_world() -> Arc<Hitable> {
     Arc::new(BVHNode::new(list))
 }
 
-pub fn rttnw_final_scene() -> Scene {
+/// An example scene from
+pub fn example_scene() -> Scene {
     let nx: i32 = 400;
     let ny: i32 = 400;
     let ns: i32 = 40;
