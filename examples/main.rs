@@ -1,8 +1,10 @@
-use crate::geometry::*;
-use crate::material::{self, Material};
-use crate::texture::*;
-use crate::tracer::*;
+extern crate rustracer;
+
 use rand::prelude::*;
+use rustracer::geometry::*;
+use rustracer::material::{self, Material};
+use rustracer::texture::*;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 fn rttnw_final_world() -> Arc<dyn Hitable> {
@@ -139,4 +141,8 @@ pub fn example_scene() -> Scene {
         cam,
         world: rttnw_final_world(),
     }
+}
+
+fn main() {
+    render(example_scene(), "./example.png".into());
 }
