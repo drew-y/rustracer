@@ -13,7 +13,7 @@ moving spheres were removed.
 ## Usage
 
 ```bash
-cargo run --release > rttnw_final_scene2.png
+cargo run --release --example main
 ```
 
 ## Performace
