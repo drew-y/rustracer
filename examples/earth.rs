@@ -1,10 +1,12 @@
-use crate::geometry::*;
-use crate::material;
-use crate::tracer::*;
+extern crate rustracer;
+
+use rustracer::geometry::*;
+use rustracer::material;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 pub fn earth() -> Scene {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(2);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(2);
 
     // The Sun
     Sphere {
@@ -64,4 +66,8 @@ pub fn earth() -> Scene {
         cam,
         world,
     }
+}
+
+fn main() {
+    render(earth(), "./earth.png".into());
 }

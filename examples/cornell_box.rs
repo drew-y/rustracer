@@ -1,10 +1,12 @@
-use crate::geometry::*;
-use crate::material;
-use crate::tracer::*;
+extern crate rustracer;
+
+use rustracer::geometry::*;
+use rustracer::material;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 pub fn cornell_box() -> Scene {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(8);
 
     let green = material::lambertion(0.12, 0.45, 0.15);
     let red = material::lambertion(0.65, 0.05, 0.05);
@@ -104,10 +106,10 @@ pub fn cornell_box() -> Scene {
 
     let nx: i32 = 800;
     let ny: i32 = 800;
-    let ns: i32 = 7000;
+    let ns: i32 = 20;
     let cam = Camera::new(CameraOpts {
-        lookfrom: Vec3::new(15.0, 3.0, 2.0),
-        lookat: Vec3::new(0.0, 0.0, 0.0),
+        lookfrom: Vec3::new(277.5, 277.5, -780.0),
+        lookat: Vec3::new(277.5, 277.5, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
         focus_dist: 13.0,
@@ -122,4 +124,8 @@ pub fn cornell_box() -> Scene {
         cam,
         world,
     }
+}
+
+fn main() {
+    render(cornell_box(), "./cornell_box.png".into());
 }

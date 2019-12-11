@@ -144,5 +144,5 @@ pub fn example_scene() -> Scene {
 }
 
 fn main() {
-    render(example_scene(), "./example.png".into());
+    render(example_scene(), "./ray-tracing-the-next-week.png".into());
 }

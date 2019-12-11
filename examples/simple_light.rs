@@ -1,11 +1,13 @@
-use crate::geometry::*;
-use crate::material::{self, Material};
-use crate::texture::*;
-use crate::tracer::*;
+extern crate rustracer;
+
+use rustracer::geometry::*;
+use rustracer::material::{self, Material};
+use rustracer::texture::*;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 pub fn simple_light() -> Scene {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(4);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(4);
 
     let floor_texture = Box::new(CheckerTexture {
         odd: Box::new(ConstantTexture::new(0.2, 0.3, 0.1)),
@@ -68,4 +70,8 @@ pub fn simple_light() -> Scene {
         cam,
         world,
     }
+}
+
+fn main() {
+    render(simple_light(), "./simple_light.png".into());
 }

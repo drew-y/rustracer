@@ -1,8 +1,10 @@
-use crate::geometry::*;
-use crate::material::{self, Material};
-use crate::texture::*;
-use crate::tracer::*;
+extern crate rustracer;
+
 use rand::prelude::*;
+use rustracer::geometry::*;
+use rustracer::material::{self, Material};
+use rustracer::texture::*;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 fn gen_coords() -> [(i32, i32); 484] {
@@ -17,11 +19,11 @@ fn gen_coords() -> [(i32, i32); 484] {
     coords
 }
 
-fn gen_random_spheres() -> Vec<Box<Hitable>> {
+fn gen_random_spheres() -> Vec<Box<dyn Hitable>> {
     let mut rng = thread_rng();
     let mut rnd = || rng.gen::<f32>();
     let fl = |i: &i32| *i as f32;
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(484);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(484);
     let coords = gen_coords();
 
     // Generate random spheres
@@ -91,7 +93,7 @@ fn gen_random_spheres() -> Vec<Box<Hitable>> {
 }
 
 pub fn random_spheres() -> Scene {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(488);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(488);
     list.extend(gen_random_spheres());
 
     let floor_texture = Box::new(CheckerTexture {
@@ -151,4 +153,8 @@ pub fn random_spheres() -> Scene {
         cam,
         world: Arc::new(BVHNode::new(list)),
     }
+}
+
+fn main() {
+    render(random_spheres(), "./random_spheres.png".into());
 }

@@ -1,11 +1,13 @@
-use crate::geometry::*;
-use crate::material::Material;
-use crate::texture::*;
-use crate::tracer::*;
+extern crate rustracer;
+
+use rustracer::geometry::*;
+use rustracer::material::Material;
+use rustracer::texture::*;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 pub fn two_perlin_spheres() -> Scene {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(8);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(8);
 
     let texture = NoiseTexture::new(4.0);
 
@@ -49,4 +51,8 @@ pub fn two_perlin_spheres() -> Scene {
         cam,
         world,
     }
+}
+
+fn main() {
+    render(two_perlin_spheres(), "./simple_light.png".into());
 }

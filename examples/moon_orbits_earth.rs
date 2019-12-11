@@ -1,8 +1,11 @@
-use crate::animation::*;
-use crate::geometry::*;
-use crate::material;
-use crate::tracer::*;
-use lazy_static;
+#[macro_use]
+extern crate lazy_static;
+extern crate rustracer;
+
+use rustracer::animation::*;
+use rustracer::geometry::*;
+use rustracer::material;
+use rustracer::tracer::*;
 use std::sync::Arc;
 
 lazy_static! {
@@ -11,7 +14,7 @@ lazy_static! {
 }
 
 fn earth(time: f32) -> Scene {
-    let mut list: Vec<Box<Hitable>> = Vec::with_capacity(2);
+    let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(2);
 
     // The Sun
     Sphere {
@@ -81,4 +84,8 @@ pub fn moon_orbits_earth() {
         duration: 6,
         scene_fn: &earth,
     });
+}
+
+fn main() {
+    moon_orbits_earth();
 }
