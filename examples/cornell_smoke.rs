@@ -93,14 +93,14 @@ pub fn cornell_smoke() -> Scene {
     .shift(265.0, 0.0, 295.0);
 
     ConstantMedium {
-        boundry: b1,
+        boundry: Box::new(b1),
         density: 0.01,
         phase_function: material::isotropic(1.0, 1.0, 1.0),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     ConstantMedium {
-        boundry: b2,
+        boundry: Box::new(b2),
         density: 0.01,
         phase_function: material::isotropic(0.0, 0.0, 0.0),
     }

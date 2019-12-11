@@ -9,6 +9,13 @@ pub trait Hitable: Sync + Send {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord>;
     /// If t0 and t1 inside the hitable's box it will return (tmin, tmax)
     fn bounding_box(&self) -> Option<BoundingBox>;
+    fn box_clone(&self) -> Box<dyn Hitable>;
+}
+
+impl Clone for Box<dyn Hitable> {
+    fn clone(&self) -> Box<dyn Hitable> {
+        self.box_clone()
+    }
 }
 
 pub type BoxHitable = Box<dyn Hitable>;
@@ -31,6 +38,10 @@ impl Hitable for Arc<dyn Hitable> {
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.deref().bounding_box()
     }
+
+    fn box_clone(&self) -> Box<dyn Hitable> {
+        self.deref().box_clone()
+    }
 }
 
 impl Hitable for Box<dyn Hitable> {
@@ -40,5 +51,9 @@ impl Hitable for Box<dyn Hitable> {
 
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.deref().bounding_box()
+    }
+
+    fn box_clone(&self) -> Box<dyn Hitable> {
+        self.deref().box_clone()
     }
 }

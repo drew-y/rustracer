@@ -3,13 +3,14 @@ use super::translation::Translation;
 use rand::prelude::*;
 use std::f32::MAX;
 
-pub struct ConstantMedium<T: Hitable> {
-    pub boundry: T,
+#[derive(Clone)]
+pub struct ConstantMedium {
+    pub boundry: BoxHitable,
     pub density: f32,
     pub phase_function: Material,
 }
 
-impl<T: Hitable> Hitable for ConstantMedium<T> {
+impl Hitable for ConstantMedium {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut rec1 = self.boundry.hit(r, -MAX, MAX)?;
         let mut rec2 = self.boundry.hit(r, rec1.t + 0.0001, MAX)?;
@@ -46,6 +47,14 @@ impl<T: Hitable> Hitable for ConstantMedium<T> {
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.boundry.bounding_box()
     }
+
+    fn box_clone(&self) -> Box<dyn Hitable> {
+        Box::new(ConstantMedium {
+            boundry: self.boundry.clone(),
+            density: self.density,
+            phase_function: self.phase_function.clone(),
+        })
+    }
 }
 
-impl<T: Hitable> Translation for ConstantMedium<T> {}
+impl Translation for ConstantMedium {}

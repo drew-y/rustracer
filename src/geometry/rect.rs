@@ -1,6 +1,7 @@
 use super::super::{material::Material, tracer::*};
 use super::translation::Translation;
 
+#[derive(Clone)]
 pub struct XYRect {
     pub x0: f32,
     pub x1: f32,
@@ -39,10 +40,15 @@ impl Hitable for XYRect {
             max: Vec3::new(self.x1, self.y1, self.k + 0.0001),
         })
     }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
+    }
 }
 
 impl Translation for XYRect {}
 
+#[derive(Clone)]
 pub struct XZRect {
     pub x0: f32,
     pub x1: f32,
@@ -81,10 +87,15 @@ impl Hitable for XZRect {
             max: Vec3::new(self.x1, self.k + 0.0001, self.z1),
         })
     }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
+    }
 }
 
 impl Translation for XZRect {}
 
+#[derive(Clone)]
 pub struct YZRect {
     pub y0: f32,
     pub y1: f32,
@@ -124,6 +135,10 @@ impl Hitable for YZRect {
             min: Vec3::new(self.k - 0.0001, self.y0, self.z0),
             max: Vec3::new(self.k + 0.0001, self.y1, self.z1),
         })
+    }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
     }
 }
 

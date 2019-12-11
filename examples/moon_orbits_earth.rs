@@ -38,7 +38,8 @@ fn earth(time: f32) -> Scene {
             center: Vec3::new(0.0, 0.0, 0.0),
             radius: 3.51,
             material: material::lambertion(0.0, 0.0, 0.0),
-        },
+        }
+        .box_clone(),
         density: 20.0,
         phase_function: material::isotropic(0.45, 0.77, 0.9999),
     }

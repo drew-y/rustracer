@@ -61,6 +61,10 @@ impl Hitable for Sphere {
             max: self.center + Vec3::new(self.radius, self.radius, self.radius),
         })
     }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
+    }
 }
 
 impl Hitable for Box<Sphere> {
@@ -70,6 +74,10 @@ impl Hitable for Box<Sphere> {
 
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.deref().bounding_box()
+    }
+
+    fn box_clone(&self) -> BoxHitable {
+        self.deref().box_clone()
     }
 }
 

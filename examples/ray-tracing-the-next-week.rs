@@ -65,7 +65,7 @@ fn rttnw_final_world() -> Arc<dyn Hitable> {
     };
 
     ConstantMedium {
-        boundry: boundry1.clone(),
+        boundry: boundry1.box_clone(),
         density: 0.2,
         phase_function: material::isotropic(0.2, 0.4, 0.9),
     }
@@ -79,7 +79,7 @@ fn rttnw_final_world() -> Arc<dyn Hitable> {
     };
 
     ConstantMedium {
-        boundry: boundry2,
+        boundry: boundry2.box_clone(),
         density: 0.0001,
         phase_function: material::isotropic(1.0, 1.0, 1.0),
     }

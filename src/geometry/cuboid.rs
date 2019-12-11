@@ -4,6 +4,7 @@ use super::{
     translation::Translation,
 };
 
+#[derive(Clone)]
 pub struct Cuboid {
     rects: BVHNode,
 }
@@ -88,6 +89,10 @@ impl Hitable for Cuboid {
 
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.rects.bounding_box()
+    }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
     }
 }
 

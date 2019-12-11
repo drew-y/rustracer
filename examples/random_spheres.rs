@@ -137,8 +137,8 @@ pub fn random_spheres() -> Scene {
     let ny: i32 = 400;
     let ns: i32 = 40;
     let cam = Camera::new(CameraOpts {
-        lookfrom: Vec3::new(478.0, 278.0, -600.0),
-        lookat: Vec3::new(278.0, 278.0, 0.0),
+        lookfrom: Vec3::new(5.0, 5.0, -10.0),
+        lookat: Vec3::new(0.0, 0.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
         focus_dist: 10.0,

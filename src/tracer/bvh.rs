@@ -7,6 +7,7 @@ use super::{
 use rand::prelude::*;
 use std::cmp::Ordering;
 
+#[derive(Clone)]
 pub struct BVHNode {
     pub left: Option<BoxHitable>,
     pub right: Option<BoxHitable>,
@@ -141,6 +142,10 @@ impl Hitable for BVHNode {
 
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.bbox
+    }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
     }
 }
 

@@ -1,11 +1,12 @@
 use super::super::tracer::*;
 use std::f32::{consts::PI, MAX as F32MAX};
 
-pub struct FlipNormals<T: Hitable> {
-    hitable: T,
+#[derive(Clone)]
+pub struct FlipNormals {
+    hitable: BoxHitable,
 }
 
-impl<T: Hitable> Hitable for FlipNormals<T> {
+impl Hitable for FlipNormals {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let rec = self.hitable.hit(r, t_min, t_max)?;
         Some(HitRecord {
@@ -17,20 +18,25 @@ impl<T: Hitable> Hitable for FlipNormals<T> {
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.hitable.bounding_box()
     }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
+    }
 }
 
-impl<T: Hitable> Translation for FlipNormals<T> {}
+impl Translation for FlipNormals {}
 
-pub fn flip_normals<T: Hitable>(hitable: T) -> FlipNormals<T> {
-    FlipNormals { hitable: hitable }
+pub fn flip_normals(hitable: BoxHitable) -> FlipNormals {
+    FlipNormals { hitable }
 }
 
-pub struct Shift<T: Hitable> {
-    hitable: T,
+#[derive(Clone)]
+pub struct Shift {
+    hitable: BoxHitable,
     offset: Vec3,
 }
 
-impl<T: Hitable> Hitable for Shift<T> {
+impl Hitable for Shift {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let moved_ray = Ray {
             origin: r.origin - self.offset,
@@ -57,18 +63,23 @@ impl<T: Hitable> Hitable for Shift<T> {
             None
         }
     }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
+    }
 }
 
-impl<T: Hitable> Translation for Shift<T> {}
+impl Translation for Shift {}
 
-pub struct YRotation<T: Hitable> {
-    hitable: T,
+#[derive(Clone)]
+pub struct YRotation {
+    hitable: BoxHitable,
     sin_theta: f32,
     cos_theta: f32,
     bbox: Option<BoundingBox>,
 }
 
-impl<T: Hitable> YRotation<T> {
+impl YRotation {
     fn gen_bbox(hitable_bbox: BoundingBox, cos_theta: f32, sin_theta: f32) -> BoundingBox {
         let mut min = Vec3::new(F32MAX, F32MAX, F32MAX);
         let mut max = Vec3::new(-F32MAX, -F32MAX, -F32MAX);
@@ -98,7 +109,7 @@ impl<T: Hitable> YRotation<T> {
     }
 
     /// Rotate a hitable about the y axis by angle in degrees
-    pub fn new(hitable: T, angle: f32) -> YRotation<T> {
+    pub fn new(hitable: BoxHitable, angle: f32) -> YRotation {
         let radians = (PI / 180.0) * angle;
         let sin_theta = radians.sin();
         let cos_theta = radians.cos();
@@ -118,7 +129,7 @@ impl<T: Hitable> YRotation<T> {
     }
 }
 
-impl<T: Hitable> Hitable for YRotation<T> {
+impl Hitable for YRotation {
     fn hit(&self, r: &Ray, t_min: f32, t_max: f32) -> Option<HitRecord> {
         let mut origin = r.origin;
         let mut direction = r.direction;
@@ -140,24 +151,28 @@ impl<T: Hitable> Hitable for YRotation<T> {
     fn bounding_box(&self) -> Option<BoundingBox> {
         self.bbox
     }
+
+    fn box_clone(&self) -> BoxHitable {
+        Box::new(self.clone())
+    }
 }
 
-impl<T: Hitable> Translation for YRotation<T> {}
+impl Translation for YRotation {}
 
 pub trait Translation: Hitable + Sized {
-    fn shift(self, x: f32, y: f32, z: f32) -> Shift<Self> {
+    fn shift(self, x: f32, y: f32, z: f32) -> Shift {
         Shift {
-            hitable: self,
+            hitable: self.box_clone(),
             offset: Vec3::new(x, y, z),
         }
     }
 
-    fn rotate_y(self, angle: f32) -> YRotation<Self> {
-        YRotation::new(self, angle)
+    fn rotate_y(self, angle: f32) -> YRotation {
+        YRotation::new(self.box_clone(), angle)
     }
 
-    fn flip_normals(self) -> FlipNormals<Self> {
-        flip_normals(self)
+    fn flip_normals(self) -> FlipNormals {
+        flip_normals(self.box_clone())
     }
 
     fn to_box(self) -> Box<Self> {
