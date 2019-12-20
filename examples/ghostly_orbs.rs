@@ -1,46 +1,49 @@
 extern crate rustracer;
 
-use rand::prelude::*;
+use rustracer::animation::*;
 use rustracer::geometry::*;
 use rustracer::material::{self};
-// use rustracer::texture::*;
 use rustracer::tracer::*;
 use std::sync::Arc;
 
-fn obsidian_world() -> Arc<dyn Hitable> {
-    let mut list: Vec<BoxHitable> = Vec::new();
-    let mut rng = thread_rng();
-    let mut rand = || rng.gen::<f32>();
-    let light = material::diffuse_light(7.0, 7.0, 7.0);
+type List = Vec<BoxHitable>;
 
-    // Make Randomly spaced black cubes
-    let nb = 20;
-    for i in 0..nb {
-        for j in 0..nb {
-            let width = 100;
-            let x0 = -1000 + i * width;
-            let z0 = -1000 + j * width;
-            let y0 = 0;
-            let x1 = x0 + width;
-            let y1 = 100.0 * rand() + 0.01;
-            let z1 = z0 + width;
-            let cube = Cuboid::new(
-                Vec3::new(x0 as f32, y0 as f32, z0 as f32),
-                Vec3::new(x1 as f32, y1, z1 as f32),
-                material::dielectric(1.5),
-            );
+fn cube_light(center: Vec3, list: &mut List) {
+    let brightness = center.y / 100.0;
+    Cuboid::cube(
+        12.0,
+        center,
+        material::diffuse_light(10.0 * brightness, 9.8 * brightness, 6.3 * brightness),
+    )
+    .push_into_list_of_boxed_hitables(list);
+}
 
-            ConstantMedium {
-                boundry: cube.box_clone(),
-                density: 0.2,
-                phase_function: material::isotropic(0.1, 0.1, 0.1),
+fn cube_grid(list: &mut List, time: f32) {
+    for x in -150..150 {
+        for z in -150..150 {
+            if (x as i32).abs() <= 2 && (z as i32).abs() <= 2 {
+                continue;
             }
-            .push_into_list_of_boxed_hitables(&mut list);
-            cube.push_into_list_of_boxed_hitables(&mut list);
+            cube_light(
+                Vec3::new(
+                    x as f32 * 100.0,
+                    60.0 * ((time / 2.0) + (x as f32).abs() + (z as f32).abs())
+                        .sin()
+                        .abs(),
+                    z as f32 * 100.0,
+                ),
+                list,
+            );
         }
     }
+}
 
-    // The main light
+fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
+    let mut list: List = Vec::new();
+    let light = material::diffuse_light(7.0, 7.0, 7.0);
+    let red_light = material::diffuse_light(0.9, 0.2, 0.2);
+
+    // Main Light
     XZRect {
         x0: 123.0,
         x1: 423.0,
@@ -51,46 +54,75 @@ fn obsidian_world() -> Arc<dyn Hitable> {
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
-    // Blue Sphere
-    let boundry1 = Sphere {
-        center: Vec3::new(360.0, 150.0, 145.0),
-        radius: 50.0,
-        material: material::dielectric(1.5),
-    };
+    // Floor
+    let floor = Cuboid::new(
+        Vec3::new(-1000.0, -300.0, -1000.0),
+        Vec3::new(1000.0, 0.0, 1000.0),
+        material::dielectric(1.5),
+    );
 
     ConstantMedium {
-        boundry: boundry1.box_clone(),
-        density: 0.2,
-        phase_function: material::isotropic(0.2, 0.4, 0.9),
-    }
-    .push_into_list_of_boxed_hitables(&mut list);
-    boundry1.push_into_list_of_boxed_hitables(&mut list);
-
-    // Black Sphere
-    let boundry2 = Sphere {
-        center: Vec3::new(150.0, 150.0, 145.0),
-        radius: 50.0,
-        material: material::dielectric(1.5),
-    };
-
-    ConstantMedium {
-        boundry: boundry2.box_clone(),
+        boundry: floor.box_clone(),
         density: 0.2,
         phase_function: material::isotropic(0.0, 0.0, 0.0),
     }
     .push_into_list_of_boxed_hitables(&mut list);
-    boundry2.push_into_list_of_boxed_hitables(&mut list);
+    floor.push_into_list_of_boxed_hitables(&mut list);
+
+    cube_grid(&mut list, time);
+
+    // Glass Sphere
+    Sphere {
+        center: Vec3::new(0.0, 55.0, 0.0),
+        radius: 50.0,
+        material: material::dielectric(1.5),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    let red_orbit = Orbit3D::new(Vec3::new(23.0, 60.0, 0.0), Vec3::new(0.0, 55.0, 0.0), 72.0);
+
+    // Glowing Red Ball inside Glass Sphere
+    Sphere {
+        center: red_orbit.point_at_time(time),
+        radius: 5.0,
+        material: red_light.clone(),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    // Mirror core of sphere
+    Sphere {
+        center: Vec3::new(0.0, 55.0, 0.0),
+        radius: 9.0,
+        material: material::metal(Vec3::new(0.7, 0.6, 0.5), 0.0),
+    }
+    .push_into_list_of_boxed_hitables(&mut list);
+
+    // Background
+    Sphere {
+        center: Vec3::new(0.0, 0.0, 0.0),
+        radius: 2000.0,
+        material: material::lambertion(0.1, 0.1, 0.2),
+    }
+    .flip_normals()
+    .push_into_list_of_boxed_hitables(&mut list);
 
     Arc::new(BVHNode::new(list))
 }
 
-fn obsidian_scene() -> Scene {
+fn ghostly_orbs_scene(time: f32) -> Scene {
     let nx: i32 = 400;
     let ny: i32 = 400;
-    let ns: i32 = 40;
+    let ns: i32 = 2;
+
+    let camera_orbit = Orbit3D::new(
+        Vec3::new(200.0, 200.0, -700.0),
+        Vec3::new(0.0, 50.0, 0.0),
+        1.0,
+    );
+
     let cam = Camera::new(CameraOpts {
-        lookfrom: Vec3::new(478.0, 278.0, -600.0),
-        lookat: Vec3::new(278.0, 278.0, 0.0),
+        lookfrom: camera_orbit.point_at_time(time),
+        lookat: Vec3::new(0.0, 50.0, 0.0),
         vup: Vec3::new(0.0, 1.0, 0.0),
         aspect: nx as f32 / ny as f32,
         focus_dist: 10.0,
@@ -103,10 +135,17 @@ fn obsidian_scene() -> Scene {
         ny,
         ns,
         cam,
-        world: obsidian_world(),
+        world: ghostly_orbs(time),
     }
 }
 
 fn main() {
-    render(obsidian_scene(), "./obsidian.png".into());
+    render_animation(
+        AnimatedScene {
+            fps: 24,
+            duration: 6,
+            scene_fn: &ghostly_orbs_scene,
+        },
+        "ghostly_orbs".into(),
+    );
 }
