@@ -80,11 +80,14 @@ fn earth(time: f32) -> Scene {
 }
 
 pub fn moon_orbits_earth() {
-    render_animation(AnimatedScene {
-        fps: 60,
-        duration: 6,
-        scene_fn: &earth,
-    });
+    render_animation(
+        AnimatedScene {
+            fps: 60,
+            duration: 6,
+            scene_fn: &earth,
+        },
+        "moon_orbits_earth".into(),
+    );
 }
 
 fn main() {
