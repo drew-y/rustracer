@@ -80,6 +80,24 @@ impl Cuboid {
             rects: BVHNode::new(list),
         }
     }
+
+    pub fn cube(diagonal: f32, center: Vec3, material: Material) -> Cuboid {
+        let side_length = (3.0 * diagonal * diagonal).sqrt();
+        let half_side = side_length / 2.0;
+        Cuboid::new(
+            Vec3::new(
+                center.x - half_side,
+                center.y - half_side,
+                center.z - half_side,
+            ),
+            Vec3::new(
+                center.x + half_side,
+                center.y + half_side,
+                center.z + half_side,
+            ),
+            material,
+        )
+    }
 }
 
 impl Hitable for Cuboid {
