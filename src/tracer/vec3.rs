@@ -79,6 +79,10 @@ impl Vec3 {
             _ => panic!("Invalid Vec3 index"),
         }
     }
+
+    pub fn distance_from(self, vec: Vec3) -> f32 {
+        ((self.x - vec.x).powi(2) + (self.y - vec.y).powi(2) + (self.z - vec.z).powi(2)).sqrt()
+    }
 }
 
 impl fmt::Display for Vec3 {

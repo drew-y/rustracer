@@ -9,11 +9,11 @@ use std::sync::Arc;
 type List = Vec<BoxHitable>;
 
 fn cube_light(center: Vec3, list: &mut List) {
-    let brightness = center.y / 100.0;
+    let brightness = (1.1 as f32).powf(center.y) / 100.0;
     Cuboid::cube(
         12.0,
         center,
-        material::diffuse_light(10.0 * brightness, 9.8 * brightness, 6.3 * brightness),
+        material::diffuse_light(2.2 * brightness, 2.1 * brightness, 1.4 * brightness),
     )
     .push_into_list_of_boxed_hitables(list);
 }
@@ -24,13 +24,18 @@ fn cube_grid(list: &mut List, time: f32) {
             if (x as i32).abs() <= 2 && (z as i32).abs() <= 2 {
                 continue;
             }
+
+            let distance = 100.0;
+            let x = x as f32 * distance;
+            let z = z as f32 * distance;
             cube_light(
                 Vec3::new(
-                    x as f32 * 100.0,
-                    60.0 * ((time / 2.0) + (x as f32).abs() + (z as f32).abs())
+                    x,
+                    50.0 * (time
+                        + Vec3::new(x, 0.0, z).distance_from(Vec3::new(0.0, 0.0, 0.0)) / 3.0)
                         .sin()
                         .abs(),
-                    z as f32 * 100.0,
+                    z,
                 ),
                 list,
             );
@@ -110,14 +115,14 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 }
 
 fn ghostly_orbs_scene(time: f32) -> Scene {
-    let nx: i32 = 400;
-    let ny: i32 = 400;
-    let ns: i32 = 2;
+    let nx: i32 = 280;
+    let ny: i32 = 280;
+    let ns: i32 = 1;
 
     let camera_orbit = Orbit3D::new(
         Vec3::new(200.0, 200.0, -700.0),
         Vec3::new(0.0, 50.0, 0.0),
-        1.0,
+        2.0,
     );
 
     let cam = Camera::new(CameraOpts {
