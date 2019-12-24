@@ -29,14 +29,7 @@ fn cube_grid(list: &mut List, time: f32) {
             let x = x as f32 * distance;
             let z = z as f32 * distance;
             cube_light(
-                Vec3::new(
-                    x,
-                    50.0 * (time
-                        + Vec3::new(x, 0.0, z).distance_from(Vec3::new(0.0, 0.0, 0.0)) / 3.0)
-                        .sin()
-                        .abs(),
-                    z,
-                ),
+                Vec3::new(x, 50.0 * (time + x.abs().max(z.abs())).sin().abs(), z),
                 list,
             );
         }
