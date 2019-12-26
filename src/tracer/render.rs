@@ -93,12 +93,14 @@ pub fn render(scene: Scene, path: String) {
 }
 
 pub fn render_animation(scene: AnimatedScene, path: String) {
-    let frames = scene.fps * scene.duration;
-    for frame in 1..=frames {
-        let time = frame as f32 / scene.fps as f32;
+    let time_step = 1.0 / scene.fps;
+    let mut time = scene.start;
+
+    while time <= scene.end {
         render(
             (scene.scene_fn)(time),
-            format!("./{}/frame{}.png", path, frame),
+            format!("./{}/frame-{}.png", path, time),
         );
+        time += time_step;
     }
 }

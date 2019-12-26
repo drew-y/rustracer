@@ -12,8 +12,9 @@ pub struct Scene {
 
 #[derive(Clone)]
 pub struct AnimatedScene {
-    pub fps: i32,
-    pub duration: i32,
+    pub fps: f32,
+    pub start: f32,
+    pub end: f32,
     /// A function that returns a scene when passed time in seconds
     pub scene_fn: &'static dyn Fn(f32) -> Scene,
 }
