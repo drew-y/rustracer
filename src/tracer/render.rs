@@ -94,8 +94,8 @@ pub fn render(scene: Scene, path: String) {
     let thread_count = num_cpus::get();
     let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> = Vec::with_capacity(thread_count);
     let y_section_size = ny / thread_count as i32;
-    let mut start_y = 0;
-    let mut end_y = start_y + y_section_size;
+    let mut start_y = ny - y_section_size;
+    let mut end_y = ny;
     let pb = render_progress_bar(ny);
 
     for _thread in 0..thread_count {
@@ -104,8 +104,8 @@ pub fn render(scene: Scene, path: String) {
         let render_thread =
             thread::spawn(move || render_section(thread_scene, start_y, end_y, thread_pb));
         render_threads.push(render_thread);
-        start_y = end_y;
-        end_y += y_section_size;
+        end_y = start_y;
+        start_y -= y_section_size;
     }
 
     for render_thread in render_threads {
@@ -113,7 +113,7 @@ pub fn render(scene: Scene, path: String) {
     }
 
     // Render any remaining y pixels. Not the most efficient. But it works for now.
-    file.extend(render_section(scene, start_y, ny, pb.clone()));
+    file.extend(render_section(scene, 0, end_y, pb.clone()));
 
     pb.finish_with_message("Complete");
 
