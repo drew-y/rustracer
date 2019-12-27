@@ -112,8 +112,22 @@ pub fn render(scene: Scene, path: String) {
         file.extend(render_thread.join().unwrap());
     }
 
-    // Render any remaining y pixels. Not the most efficient. But it works for now.
-    file.extend(render_section(scene, 0, end_y, pb.clone()));
+    // Render remaining y columns
+    let remaining_y_columns = ny - (y_section_size * thread_count as i32);
+    if remaining_y_columns > 0 {
+        render_threads = Vec::with_capacity(remaining_y_columns as usize);
+        for column in (0..remaining_y_columns).rev() {
+            let thread_scene = scene.clone();
+            let thread_pb = pb.clone();
+            let render_thread =
+                thread::spawn(move || render_section(thread_scene, column - 1, column, thread_pb));
+            render_threads.push(render_thread);
+        }
+
+        for render_thread in render_threads {
+            file.extend(render_thread.join().unwrap());
+        }
+    }
 
     pb.finish_with_message("Complete");
 
