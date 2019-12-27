@@ -1,13 +1,15 @@
 use super::{camera::Camera, hitable::Hitable};
 use std::sync::Arc;
 
+pub type World = Arc<dyn Hitable>;
+
 #[derive(Clone)]
 pub struct Scene {
     pub nx: i32,
     pub ny: i32,
     pub ns: i32,
     pub cam: Camera,
-    pub world: Arc<dyn Hitable>,
+    pub world: World,
 }
 
 #[derive(Clone)]
