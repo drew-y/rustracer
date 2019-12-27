@@ -7,6 +7,7 @@ use std::f32::MAX;
 
 use image;
 use indicatif::{ProgressBar, ProgressStyle};
+use num_cpus;
 use std::thread;
 
 fn color(r: &Ray, world: &impl Hitable, depth: i32) -> Vec3 {
@@ -90,27 +91,30 @@ pub fn render(scene: Scene, path: String) {
     let Scene { nx, ny, .. } = scene;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let thread_count = 8;
-    let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> =
-        Vec::with_capacity(thread_count as usize);
-    let y_section_size = ny / thread_count;
-    let mut starty = ny - y_section_size;
-    let mut endy = ny;
+    let thread_count = num_cpus::get();
+    let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> = Vec::with_capacity(thread_count);
+    let y_section_size = ny / thread_count as i32;
+    let mut start_y = 0;
+    let mut end_y = start_y + y_section_size;
     let pb = render_progress_bar(ny);
 
-    for _render_thread_num in 0..thread_count {
+    for _thread in 0..thread_count {
         let thread_scene = scene.clone();
         let thread_pb = pb.clone();
         let render_thread =
-            thread::spawn(move || render_section(thread_scene, starty, endy, thread_pb));
+            thread::spawn(move || render_section(thread_scene, start_y, end_y, thread_pb));
         render_threads.push(render_thread);
-        endy = starty;
-        starty -= y_section_size;
+        start_y = end_y;
+        end_y += y_section_size;
     }
 
     for render_thread in render_threads {
         file.extend(render_thread.join().unwrap());
     }
+
+    // Render any remaining y pixels. Not the most efficient. But it works for now.
+    file.extend(render_section(scene, start_y, ny, pb.clone()));
+
     pb.finish_with_message("Complete");
 
     match image::save_buffer(path, &file, nx as u32, ny as u32, image::ColorType::RGB(8)) {

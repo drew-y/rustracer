@@ -110,7 +110,7 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 fn ghostly_orbs_scene(time: f32) -> Scene {
     let nx: i32 = 400;
     let ny: i32 = 400;
-    let ns: i32 = 256;
+    let ns: i32 = 16;
 
     let camera_orbit = Orbit3D::new(
         Vec3::new(200.0, 200.0, -700.0),
