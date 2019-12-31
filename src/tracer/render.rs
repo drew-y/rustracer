@@ -144,11 +144,13 @@ pub fn render_animation(scene: AnimatedScene, path: String) {
     let time_step = 1.0 / scene.fps;
     let mut time = scene.start;
 
+    let mut frame = (time / time_step) as i32 + 1;
     while time <= scene.end {
         render(
             (scene.scene_fn)(time),
-            format!("./{}/frame-{}.png", path, time),
+            format!("./{}/frame-{}.png", path, frame),
         );
         time += time_step;
+        frame += 1;
     }
 }
