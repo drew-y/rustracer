@@ -31,7 +31,7 @@ fn cube_grid(list: &mut List, time: f32) {
                 continue;
             }
 
-            let y = (distance * 0.005 - time * 2.5).cos() * 100.0 - 30.0;
+            let y = (distance * 0.005 - (time + 2.0) * 2.5).cos() * 100.0 - 30.0;
             cube_light(Vec3::new(x, y, z), list);
         }
     }
@@ -92,7 +92,7 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 
     // Glowing Blue Ball inside Glass Sphere
     let blue_orbit = Orbit3D::new(
-        Vec3::new(-47.0, 100.0, -50.0),
+        Vec3::new(-47.0, 100.0, -40.0),
         Vec3::new(0.0, 80.0, 0.0),
         25.0,
     );
@@ -105,7 +105,7 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 
     // Glowing Green Ball inside Glass Sphere
     let green_orbit = Orbit3D::new(
-        Vec3::new(-10.0, 40.0, -50.0),
+        Vec3::new(-10.0, 40.0, -40.0),
         Vec3::new(0.0, 80.0, 0.0),
         -70.0,
     );
