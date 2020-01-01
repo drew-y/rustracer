@@ -92,7 +92,7 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 
     // Glowing Blue Ball inside Glass Sphere
     let blue_orbit = Orbit3D::new(
-        Vec3::new(-47.0, 100.0, -30.0),
+        Vec3::new(-47.0, 100.0, -50.0),
         Vec3::new(0.0, 80.0, 0.0),
         25.0,
     );
