@@ -14,11 +14,11 @@ impl Orbit3D {
     pub fn new(start_point: Vec3, center: Vec3, velocity: f32) -> Orbit3D {
         let rise = start_point.y - center.y;
         let run = Vec3::new(start_point.x, 0.0, start_point.z)
-            .distance_from(Vec3::new(center.z, 0.0, center.z));
+            .distance_from(Vec3::new(center.x, 0.0, center.z));
         let inclination = rise.atan2(run);
         Orbit3D {
             center,
-            radius: start_point.distance_from(center),
+            radius: run,
             inclination,
             velocity,
         }
@@ -26,8 +26,8 @@ impl Orbit3D {
 
     /// Find the point at azimut in DEGREES
     pub fn point_at_azimuth(&self, azimuth: f32) -> Vec3 {
-        let x = azimuth.to_radians().cos() * self.radius;
-        let z = azimuth.to_radians().sin() * self.radius;
+        let x = self.radius * azimuth.to_radians().cos();
+        let z = self.radius * azimuth.to_radians().sin();
         let y = x * self.inclination.tan();
         Vec3::new(x, y, z) + self.center
     }
