@@ -13,11 +13,12 @@ pub struct Orbit3D {
 impl Orbit3D {
     pub fn new(start_point: Vec3, center: Vec3, velocity: f32) -> Orbit3D {
         let rise = start_point.y - center.y;
-        let run = ((start_point.x * start_point.x) + (start_point.z * start_point.z)).sqrt();
+        let run = Vec3::new(start_point.x, 0.0, start_point.z)
+            .distance_from(Vec3::new(center.z, 0.0, center.z));
         let inclination = rise.atan2(run);
         Orbit3D {
             center,
-            radius: (start_point - center).length(),
+            radius: start_point.distance_from(center),
             inclination,
             velocity,
         }
@@ -27,7 +28,7 @@ impl Orbit3D {
     pub fn point_at_azimuth(&self, azimuth: f32) -> Vec3 {
         let x = azimuth.to_radians().cos() * self.radius;
         let z = azimuth.to_radians().sin() * self.radius;
-        let y = (x / self.inclination.cos()) * self.inclination.sin();
+        let y = x * self.inclination.tan();
         Vec3::new(x, y, z) + self.center
     }
 
@@ -40,15 +41,24 @@ impl Orbit3D {
 
 #[derive(Copy, Clone)]
 /// Linear Movement at a constant velocity definition
-pub struct ConstantMoveL {
-    pub origin: Vec3,
-    pub direction: Vec3,
-    pub velocity: f32,
+pub struct MoveL {
+    start: Vec3,
+    end: Vec3,
+    velocity: f32,
 }
 
-impl ConstantMoveL {
+impl MoveL {
+    pub fn new(start: Vec3, end: Vec3, velocity: f32) -> MoveL {
+        MoveL {
+            start,
+            end,
+            velocity,
+        }
+    }
+
     pub fn point_at_time(&self, time: f32) -> Vec3 {
-        let distance = self.velocity * time;
-        self.origin + distance * self.direction
+        let progress_to_end =
+            ((self.velocity * time) / self.start.distance_from(self.end)).min(1.0);
+        self.start + progress_to_end * (self.end - self.start)
     }
 }
