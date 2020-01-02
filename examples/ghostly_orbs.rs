@@ -73,15 +73,15 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     Sphere {
         center: Vec3::new(0.0, 80.0, 0.0),
         radius: GLASS_SPHERE_RADIUS,
-        material: material::dielectric(1.01),
+        material: material::dielectric(1.0),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
     // Glowing Red Ball inside Glass Sphere
     let red_orbit = Orbit3D::new(
-        Vec3::new(47.0, 80.0, 20.0),
+        Vec3::new(-45.0, 60.0, 0.0),
         Vec3::new(0.0, 80.0, 0.0),
-        -72.0,
+        -160.0,
     );
     Sphere {
         center: red_orbit.point_at_time(time),
@@ -91,13 +91,9 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     .push_into_list_of_boxed_hitables(&mut list);
 
     // Glowing Blue Ball inside Glass Sphere
-    let blue_orbit = Orbit3D::new(
-        Vec3::new(-47.0, 100.0, -40.0),
-        Vec3::new(0.0, 80.0, 0.0),
-        25.0,
-    );
+    let blue_orbit = Orbit3D::new(Vec3::new(45.0, 80.0, 0.0), Vec3::new(0.0, 80.0, 0.0), 150.0);
     Sphere {
-        center: blue_orbit.point_at_time(time + 5.0),
+        center: blue_orbit.point_at_time(time + 1.0),
         radius: 8.0,
         material: material::diffuse_light(0.2, 0.2, 9.0),
     }
@@ -105,12 +101,12 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 
     // Glowing Green Ball inside Glass Sphere
     let green_orbit = Orbit3D::new(
-        Vec3::new(-10.0, 40.0, -40.0),
+        Vec3::new(0.0, 120.0, -45.0),
         Vec3::new(0.0, 80.0, 0.0),
-        -70.0,
+        -140.0,
     );
     Sphere {
-        center: green_orbit.point_at_time(time + 3.0),
+        center: green_orbit.point_at_time(time + 2.0),
         radius: 10.0,
         material: material::diffuse_light(0.2, 0.9, 0.2),
     }
@@ -136,10 +132,11 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     Arc::new(BVHNode::new(list))
 }
 
-fn ghostly_orbs_scene(time: f32) -> Scene {
-    let nx: i32 = 300;
-    let ny: i32 = 300;
-    let ns: i32 = 1;
+#[allow(dead_code)]
+fn ghostly_orbs_view_1(time: f32) -> Scene {
+    let nx: i32 = 324;
+    let ny: i32 = 324;
+    let ns: i32 = 1000;
 
     let camera_orbit = Orbit3D::new(
         Vec3::new(200.0, 90.0, -300.0),
@@ -166,14 +163,45 @@ fn ghostly_orbs_scene(time: f32) -> Scene {
     }
 }
 
+#[allow(dead_code)]
+fn ghostly_orbs_view_2(time: f32) -> Scene {
+    let nx: i32 = 324;
+    let ny: i32 = 324;
+    let ns: i32 = 800;
+
+    let camera_move = MoveL::new(
+        Vec3::new(0.0, 90.0, -300.0),
+        Vec3::new(0.0, 300.0, -700.0),
+        75.0,
+    );
+
+    let cam = Camera::new(CameraOpts {
+        lookfrom: camera_move.point_at_time(time),
+        lookat: Vec3::new(0.0, 80.0, 0.0),
+        vup: Vec3::new(0.0, 1.0, 0.0),
+        aspect: nx as f32 / ny as f32,
+        focus_dist: 10.0,
+        aperture: 0.0,
+        vfow: 40.0,
+    });
+
+    Scene {
+        nx,
+        ny,
+        ns,
+        cam,
+        world: ghostly_orbs(time),
+    }
+}
+
 fn main() {
-    // render(ghostly_orbs_scene(1.0), "./ghostly_orbs.png".into());
+    // render(ghostly_orbs_view_2(0.0), "./ghostly_orbs.png".into());
     render_animation(
         AnimatedScene {
             fps: 24.0,
             start: 0.0,
-            end: 5.0,
-            scene_fn: &ghostly_orbs_scene,
+            end: 8.0,
+            scene_fn: &ghostly_orbs_view_2,
         },
         "ghostly_orbs".into(),
     );
