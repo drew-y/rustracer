@@ -41,18 +41,13 @@ fn sample_color(scene: &Scene, i: i32, j: i32) -> Vec3 {
     let nsf = *ns as f32;
     let nxf = *nx as f32;
     let nyf = *ny as f32;
-    let if32 = i as f32;
-    let jf32 = j as f32;
-    let samples = (nsf as f32).sqrt() as i32;
 
     let mut col = Vec3::new(0.0, 0.0, 0.0);
-    for s in 0..samples {
-        for t in 0..samples {
-            let u = ((s as f32 + rng.gen::<f32>()) / nsf + if32) / nxf;
-            let v = ((t as f32 + rng.gen::<f32>()) / nsf + jf32) / nyf;
-            let r = cam.get_ray(u, v);
-            col += color(&r, world, 0);
-        }
+    for _s in 0..*ns {
+        let u = (i as f32 + rng.gen::<f32>()) / nxf;
+        let v = (j as f32 + rng.gen::<f32>()) / nyf;
+        let r = cam.get_ray(u, v);
+        col += color(&r, world, 0);
     }
 
     col /= nsf;
