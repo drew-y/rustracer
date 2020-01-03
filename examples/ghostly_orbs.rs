@@ -73,7 +73,7 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     Sphere {
         center: Vec3::new(0.0, 80.0, 0.0),
         radius: GLASS_SPHERE_RADIUS,
-        material: material::dielectric(1.0),
+        material: material::dielectric(1.5),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -167,7 +167,7 @@ fn ghostly_orbs_view_1(time: f32) -> Scene {
 fn ghostly_orbs_view_2(time: f32) -> Scene {
     let nx: i32 = 324;
     let ny: i32 = 324;
-    let ns: i32 = 800;
+    let ns: i32 = 750;
 
     let camera_move = MoveL::new(
         Vec3::new(0.0, 90.0, -300.0),
@@ -199,7 +199,7 @@ fn main() {
     render_animation(
         AnimatedScene {
             fps: 24.0,
-            start: 0.0,
+            start: 0.0833,
             end: 8.0,
             scene_fn: &ghostly_orbs_view_2,
         },
