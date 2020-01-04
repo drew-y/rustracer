@@ -86,7 +86,7 @@ pub fn render(scene: Scene, path: String) {
     let Scene { nx, ny, .. } = scene;
     let mut file: Vec<u8> = Vec::with_capacity((nx as usize) * (ny as usize) * 3);
 
-    let thread_count = num_cpus::get_physical();
+    let thread_count = num_cpus::get();
     let mut render_threads: Vec<thread::JoinHandle<Vec<u8>>> = Vec::with_capacity(thread_count);
     let y_section_size = ny / thread_count as i32;
     let mut start_y = ny - y_section_size;

@@ -167,7 +167,7 @@ fn ghostly_orbs_view_1(time: f32) -> Scene {
 fn ghostly_orbs_view_2(time: f32) -> Scene {
     let nx: i32 = 324;
     let ny: i32 = 324;
-    let ns: i32 = 750;
+    let ns: i32 = 200;
 
     let camera_move = MoveL::new(
         Vec3::new(0.0, 90.0, -300.0),
@@ -199,7 +199,7 @@ fn main() {
     render_animation(
         AnimatedScene {
             fps: 24.0,
-            start: 0.0833,
+            start: 0.0,
             end: 8.0,
             scene_fn: &ghostly_orbs_view_2,
         },
