@@ -73,7 +73,7 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     Sphere {
         center: Vec3::new(0.0, 80.0, 0.0),
         radius: GLASS_SPHERE_RADIUS,
-        material: material::dielectric(1.5),
+        material: material::dielectric(1.1),
     }
     .push_into_list_of_boxed_hitables(&mut list);
 
@@ -133,10 +133,10 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
 }
 
 #[allow(dead_code)]
-fn ghostly_orbs_view_1(time: f32) -> Scene {
+fn ghostly_orbs_view_1(time: f32) -> Image {
     let nx: i32 = 324;
     let ny: i32 = 324;
-    let ns: i32 = 1000;
+    let ns: i32 = 100;
 
     let camera_orbit = Orbit3D::new(
         Vec3::new(200.0, 90.0, -300.0),
@@ -154,20 +154,20 @@ fn ghostly_orbs_view_1(time: f32) -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world: ghostly_orbs(time),
     }
 }
 
 #[allow(dead_code)]
-fn ghostly_orbs_view_2(time: f32) -> Scene {
+fn ghostly_orbs_view_2(time: f32) -> Image {
     let nx: i32 = 324;
-    let ny: i32 = 324;
-    let ns: i32 = 200;
+    let ny: i32 = 334;
+    let ns: i32 = 2;
 
     let camera_move = MoveL::new(
         Vec3::new(0.0, 90.0, -300.0),
@@ -185,24 +185,21 @@ fn ghostly_orbs_view_2(time: f32) -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world: ghostly_orbs(time),
     }
 }
 
 fn main() {
-    // render(ghostly_orbs_view_2(0.0), "./ghostly_orbs.png".into());
-    render_animation(
-        AnimatedScene {
-            fps: 24.0,
-            start: 0.0,
-            end: 8.0,
-            scene_fn: &ghostly_orbs_view_2,
-        },
-        "ghostly_orbs".into(),
-    );
+    let renderer = AnimationRenderer::from(Animation {
+        fps: 24.0,
+        start_time: 0.0,
+        end_time: 8.0,
+        image_fn: &ghostly_orbs_view_2,
+    });
+    renderer.render("ghostly_orbs");
 }

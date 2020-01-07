@@ -13,7 +13,7 @@ lazy_static! {
     static ref MOONMAP: material::Material = material::lambertion_with_image("../moonmap.jpg");
 }
 
-fn earth(time: f32) -> Scene {
+fn earth(time: f32) -> Image {
     let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(2);
 
     // The Sun
@@ -70,25 +70,23 @@ fn earth(time: f32) -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world,
     }
 }
 
 pub fn moon_orbits_earth() {
-    render_animation(
-        AnimatedScene {
-            fps: 60.0,
-            start: 0.0,
-            end: 6.0,
-            scene_fn: &earth,
-        },
-        "moon_orbits_earth".into(),
-    );
+    let renderer = AnimationRenderer::from(Animation {
+        fps: 60.0,
+        start_time: 0.0,
+        end_time: 6.0,
+        image_fn: &earth,
+    });
+    renderer.render("moon_orbits_earth");
 }
 
 fn main() {

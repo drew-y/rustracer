@@ -5,7 +5,7 @@ use rustracer::material;
 use rustracer::tracer::*;
 use std::sync::Arc;
 
-pub fn earth() -> Scene {
+pub fn earth() -> Image {
     let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(2);
 
     // The Sun
@@ -60,15 +60,16 @@ pub fn earth() -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world,
     }
 }
 
 fn main() {
-    render(earth(), "./earth.png".into());
+    let renderer = Renderer::from(earth());
+    renderer.render("./earth.png");
 }

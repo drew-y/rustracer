@@ -6,7 +6,7 @@ use rustracer::texture::*;
 use rustracer::tracer::*;
 use std::sync::Arc;
 
-pub fn simple_light() -> Scene {
+pub fn simple_light() -> Image {
     let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(4);
 
     let floor_texture = Box::new(CheckerTexture {
@@ -63,15 +63,16 @@ pub fn simple_light() -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world,
     }
 }
 
 fn main() {
-    render(simple_light(), "./simple_light.png".into());
+    let renderer = Renderer::from(simple_light());
+    renderer.render("simple_light.png");
 }

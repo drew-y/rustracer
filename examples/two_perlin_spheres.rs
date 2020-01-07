@@ -6,7 +6,7 @@ use rustracer::texture::*;
 use rustracer::tracer::*;
 use std::sync::Arc;
 
-pub fn two_perlin_spheres() -> Scene {
+pub fn two_perlin_spheres() -> Image {
     let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(8);
 
     let texture = NoiseTexture::new(4.0);
@@ -44,15 +44,16 @@ pub fn two_perlin_spheres() -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world,
     }
 }
 
 fn main() {
-    render(two_perlin_spheres(), "./simple_light.png".into());
+    let renderer = Renderer::from(two_perlin_spheres());
+    renderer.render("two_perlin_spheres.png");
 }

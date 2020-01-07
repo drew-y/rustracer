@@ -18,8 +18,6 @@ impl Clone for Box<dyn Hitable> {
     }
 }
 
-pub type BoxHitable = Box<dyn Hitable>;
-
 #[derive(Copy, Clone)]
 pub struct HitRecord<'a> {
     pub t: f32,
@@ -57,3 +55,6 @@ impl Hitable for Box<dyn Hitable> {
         self.deref().box_clone()
     }
 }
+
+pub type BoxHitable = Box<dyn Hitable>;
+pub type World = Arc<dyn Hitable>;

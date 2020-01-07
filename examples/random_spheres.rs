@@ -92,7 +92,7 @@ fn gen_random_spheres() -> Vec<Box<dyn Hitable>> {
     list
 }
 
-pub fn random_spheres() -> Scene {
+pub fn random_spheres() -> Image {
     let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(488);
     list.extend(gen_random_spheres());
 
@@ -146,15 +146,16 @@ pub fn random_spheres() -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world: Arc::new(BVHNode::new(list)),
     }
 }
 
 fn main() {
-    render(random_spheres(), "./random_spheres.png".into());
+    let renderer = Renderer::from(random_spheres());
+    renderer.render("./random_spheres.png");
 }

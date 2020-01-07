@@ -5,7 +5,7 @@ use rustracer::material;
 use rustracer::tracer::*;
 use std::sync::Arc;
 
-pub fn cornell_box() -> Scene {
+pub fn cornell_box() -> Image {
     let mut list: Vec<Box<dyn Hitable>> = Vec::with_capacity(8);
 
     let green = material::lambertion(0.12, 0.45, 0.15);
@@ -117,15 +117,16 @@ pub fn cornell_box() -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world,
     }
 }
 
 fn main() {
-    render(cornell_box(), "./cornell_box.png".into());
+    let render = Renderer::from(cornell_box());
+    render.render("cornell_box.png");
 }

@@ -120,7 +120,7 @@ fn rttnw_final_world() -> Arc<dyn Hitable> {
 }
 
 /// An example scene from
-pub fn example_scene() -> Scene {
+pub fn example_scene() -> Image {
     let nx: i32 = 400;
     let ny: i32 = 400;
     let ns: i32 = 40;
@@ -134,15 +134,16 @@ pub fn example_scene() -> Scene {
         vfow: 40.0,
     });
 
-    Scene {
-        nx,
-        ny,
-        ns,
+    Image {
+        width: nx,
+        height: ny,
+        samples: ns,
         cam,
         world: rttnw_final_world(),
     }
 }
 
 fn main() {
-    render(example_scene(), "./ray-tracing-the-next-week.png".into());
+    let renderer = Renderer::from(example_scene());
+    renderer.render("./ray-tracing-the-next-week.png");
 }
