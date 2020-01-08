@@ -12,5 +12,6 @@ pub fn make_progress_bar(msg: &str, total: i32) -> ProgressBar {
     );
     pb.set_message(msg);
     pb.set_position(0);
+    pb.enable_steady_tick(1000);
     pb
 }

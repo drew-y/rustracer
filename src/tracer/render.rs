@@ -27,13 +27,13 @@ pub struct Renderer {
     ns: i32,
     cam: Camera,
     world: World,
-    pb: ProgressBar,
+    pb: Option<ProgressBar>,
 }
 
 impl From<Image> for Renderer {
     fn from(image: Image) -> Self {
         Renderer {
-            pb: make_progress_bar("Rendering", image.width),
+            pb: None,
             ns: image.samples,
             ny: image.height,
             nx: image.width,
@@ -92,7 +92,10 @@ impl Renderer {
                 file.push((255.99 * col.y).max(0.0).min(255.0) as u8);
                 file.push((255.99 * col.z).max(0.0).min(255.0) as u8);
             }
-            self.pb.inc(1);
+
+            if let Some(pb) = &self.pb {
+                pb.inc(1);
+            }
         }
         file
     }
@@ -137,6 +140,14 @@ impl Renderer {
             _ => {}
         }
     }
+
+    pub fn render_with_progress_bar(&mut self, path: impl std::convert::AsRef<std::path::Path>) {
+        let pb = make_progress_bar("Rendering", self.ny);
+        self.pb = Some(pb.clone());
+        self.render(path);
+        pb.finish_with_message("Complete");
+        self.pb = None;
+    }
 }
 
 /// Helpers
@@ -160,9 +171,5 @@ impl Renderer {
         }
 
         vec
-    }
-
-    pub fn override_progress_bar(&mut self, pb: ProgressBar) {
-        self.pb = pb;
     }
 }
