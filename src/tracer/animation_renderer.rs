@@ -42,4 +42,17 @@ impl AnimationRenderer {
             frame += 1;
         }
     }
+
+    pub fn render_with_progress_bar(&self, path: impl std::fmt::Display) {
+        let time_step = 1.0 / self.fps;
+        let mut time = self.start_time;
+
+        let mut frame = (time / time_step) as i32 + 1;
+        while time <= self.end_time {
+            let mut renderer = Renderer::from((self.image_fn)(time));
+            renderer.render_with_progress_bar(format!("./{}/frame-{}.png", path, frame));
+            time += time_step;
+            frame += 1;
+        }
+    }
 }
