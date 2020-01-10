@@ -15,9 +15,10 @@ fn cube(center: Vec3, list: &mut List) {
 }
 
 fn cube_grid(list: &mut List, time: f32) {
+    let distance_increment = 26.5;
+
     for x in -60..60 {
         for z in -60..60 {
-            let distance_increment = 26.5;
             let x = x as f32 * distance_increment;
             let z = z as f32 * distance_increment;
             let distance = (x.powi(2) + z.powi(2)).sqrt();
@@ -35,14 +36,14 @@ fn cube_grid(list: &mut List, time: f32) {
 fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     let mut list: List = Vec::new();
     let light = material::diffuse_light(4.0, 4.0, 4.0);
-    let metal = material::metal(Vec3::new(0.6, 0.6, 0.6), 0.0);
+    let metal = material::metal(Vec3::new(0.718, 0.431, 0.475), 0.4);
 
     // Main Light
     XZRect {
-        x0: -600.0,
-        x1: 600.0,
-        z0: -600.0,
-        z1: 600.0,
+        x0: -630.0,
+        x1: 630.0,
+        z0: -630.0,
+        z1: 630.0,
         k: 1500.0,
         material: light.clone(),
     }
@@ -122,11 +123,10 @@ fn ghostly_orbs(time: f32) -> Arc<dyn Hitable> {
     Arc::new(BVHNode::new(list))
 }
 
-#[allow(dead_code)]
 fn ghostly_orbs_view_1(time: f32) -> Image {
-    let nx: i32 = 406;
-    let ny: i32 = 406;
-    let ns: i32 = 250;
+    let nx: i32 = 408;
+    let ny: i32 = 408;
+    let ns: i32 = 300;
 
     let camera_orbit = Orbit3D::new(
         Vec3::new(200.0, 600.0, -800.0),
@@ -153,43 +153,14 @@ fn ghostly_orbs_view_1(time: f32) -> Image {
     }
 }
 
-#[allow(dead_code)]
-fn ghostly_orbs_view_2(time: f32) -> Image {
-    let nx: i32 = 406;
-    let ny: i32 = 406;
-    let ns: i32 = 2;
-
-    let camera_move = MoveL::new(
-        Vec3::new(0.0, 90.0, -300.0),
-        Vec3::new(0.0, 300.0, -700.0),
-        75.0,
-    );
-
-    let cam = Camera::new(CameraOpts {
-        lookfrom: camera_move.point_at_time(time),
-        lookat: Vec3::new(0.0, 80.0, 0.0),
-        vup: Vec3::new(0.0, 1.0, 0.0),
-        aspect: nx as f32 / ny as f32,
-        focus_dist: 10.0,
-        aperture: 0.0,
-        vfow: 40.0,
-    });
-
-    Image {
-        width: nx,
-        height: ny,
-        samples: ns,
-        cam,
-        world: ghostly_orbs(time),
-    }
-}
-
 fn main() {
-    let renderer = AnimationRenderer::from(Animation {
-        fps: 24.0,
-        start_time: 0.0,
-        end_time: 8.0,
-        image_fn: &ghostly_orbs_view_1,
-    });
-    renderer.render_with_progress_bar("ghostly_orbs");
+    // let renderer = AnimationRenderer::from(Animation {
+    //     fps: 24.0,
+    //     start_time: 0.0,
+    //     end_time: 8.0,
+    //     image_fn: &ghostly_orbs_view_1,
+    // });
+    // renderer.render_with_progress_bar("ghostly_orbs");
+    let mut renderer = Renderer::from(ghostly_orbs_view_1(0.0));
+    renderer.render_with_progress_bar("ghostly_orbs.png");
 }
